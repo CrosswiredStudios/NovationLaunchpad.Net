@@ -40,7 +40,7 @@ namespace Launchpad.NET
         }
 
         List<LaunchpadButton> GridButtons;
-
+        bool initiated;
         MidiInPort inPort;
         readonly string name;
         IMidiOutPort outPort;
@@ -65,8 +65,10 @@ namespace Launchpad.NET
         /// <param name="name">The name of the launchpad. Often 'Launchpad (1)'.</param>
         public Launchpad(string name)
         {
-            this.name = name;            
+            initiated = false;
 
+            this.name = name;
+            GridButtons = new List<LaunchpadButton>();
             GridBackgroundEffects = new List<ILaunchpadEffect>();
             GridForegroundEffects = new List<ILaunchpadEffect>();
         }
@@ -86,7 +88,6 @@ namespace Launchpad.NET
         /// <summary>
         /// Initiate the launchpad.
         /// </summary>
-        /// <param name="name"></param>
         public async void Initiate()
         {
             // Get all output MIDI devices
@@ -124,20 +125,18 @@ namespace Launchpad.NET
                 }
             }
 
-            // Create all the grid buttons
-            GridButtons = new List<LaunchpadButton>();
+            // Create all the grid buttons            
             for (var y = 0; y < 8; y++)
             for (var x = 0; x < 8; x++)
             {
                 GridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
             }
-
-            // Initiate any effects
-            GridBackgroundEffects.ForEach(effect => effect.Initiate());
-            GridForegroundEffects.ForEach(effect => effect.Initiate());
+            
+            initiated = true;
 
             // Start the update timer (10ms resolution)
             updateTimer = new Timer(Update, null, 0, 10);
+
         }
 
         /// <summary>
@@ -151,8 +150,8 @@ namespace Launchpad.NET
             switch (args.Message)
             {
                 case MidiNoteOnMessage onMessage:
-                    GridBackgroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
-                    GridForegroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
+                    GridBackgroundEffects.ForEach(effect => UpdateGrid(effect.ProcessInput(onMessage.Note)));
+                    GridForegroundEffects.ForEach(effect => UpdateGrid(effect.ProcessInput(onMessage.Note)));
                     break;
                 case MidiControlChangeMessage changeMessage:
                     // Top row
@@ -161,19 +160,16 @@ namespace Launchpad.NET
 
         }
 
-        void SetButtonColor(IEnumerable<LaunchpadButton> launchpadButtons)
+        public void RegisterGridBackgroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
         {
-            foreach (var launchpadButton in launchpadButtons)
-            {
-                SetButtonColor(launchpadButton.Id, launchpadButton.Color);
-            }
+            effect.Initiate();
+            GridBackgroundEffects.Add(effect);
         }
 
-        public void SetButtonColor(byte id, LaunchpadColor color)
+        public void RegisterForegroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
         {
-            IMidiMessage midiMessageToSend = new MidiNoteOnMessage(0, id, (byte)color);
-
-            outPort.SendMessage(midiMessageToSend);
+            effect.Initiate();
+            GridBackgroundEffects.Add(effect);
         }
 
         public void SetButtonColor(int x, int y, LaunchpadColor color)
@@ -189,9 +185,12 @@ namespace Launchpad.NET
             GridForegroundEffects.ForEach(effect => UpdateGrid(effect.Update()));
         }
 
-        void UpdateGrid(List<LaunchpadButton> launchpadButtons)
+        void UpdateGrid(List<LaunchpadButton> buttonUpdates)
         {
-            launchpadButtons.ForEach(button => GridButtons.)
+            buttonUpdates.ForEach(buttonUpdate =>
+            {
+                GridButtons.FirstOrDefault(button => button.Id == buttonUpdate.Id).Color = buttonUpdate.Color;
+            });
         }
     }
 }
