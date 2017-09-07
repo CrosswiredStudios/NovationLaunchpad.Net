@@ -109,6 +109,7 @@
     <Compile Include="Effects\ILaunchpadEffect.cs" />
     <Compile Include="Launchpad.cs" />
     <Compile Include="Models\LaunchpadButton.cs" />
+    <Compile Include="Models\LaunchpadButtonCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Launchpad.NET.rd.xml" />
   </ItemGroup>

@@ -49,9 +49,15 @@ namespace Launchpad.NET
         List<LaunchpadButton> sideColumn;
         List<LaunchpadButton> topRow;
 
-        public List<ILaunchpadEffect> BackgroundEffects { get; set; }
-        public List<ILaunchpadEffect> ForegroundEffects { get; set; }
-        public List<ILaunchpadEffect> InteractionEffects { get; set; }
+        /// <summary>
+        /// Launchpad effects to run on the main grid as the background
+        /// </summary>
+        public List<ILaunchpadEffect> GridBackgroundEffects { get; set; }
+
+        /// <summary>
+        /// Launchpad effects to run on the main grid as the foreground
+        /// </summary>
+        public List<ILaunchpadEffect> GridForegroundEffects { get; set; }
 
         /// <summary>
         /// Create a launchpad instance
@@ -61,9 +67,8 @@ namespace Launchpad.NET
         {
             this.name = name;            
 
-            BackgroundEffects = new List<ILaunchpadEffect>();
-            ForegroundEffects = new List<ILaunchpadEffect>();
-            InteractionEffects = new List<ILaunchpadEffect>();
+            GridBackgroundEffects = new List<ILaunchpadEffect>();
+            GridForegroundEffects = new List<ILaunchpadEffect>();
         }
 
         /// <summary>
@@ -124,20 +129,12 @@ namespace Launchpad.NET
             for (var y = 0; y < 8; y++)
             for (var x = 0; x < 8; x++)
             {
-                GridButtons.Add(new LaunchpadButton(outPort)
-                {
-                    Color = LaunchpadColor.Off,
-                    Id = (byte)(y * 16 + x)
-                });
+                GridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
             }
 
-            // Turn off all buttons
-            ClearGridButtons();
-
             // Initiate any effects
-            BackgroundEffects.ForEach(effect => effect.Initiate());
-            ForegroundEffects.ForEach(effect => effect.Initiate());
-            InteractionEffects.ForEach(effect => effect.Initiate());
+            GridBackgroundEffects.ForEach(effect => effect.Initiate());
+            GridForegroundEffects.ForEach(effect => effect.Initiate());
 
             // Start the update timer (10ms resolution)
             updateTimer = new Timer(Update, null, 0, 10);
@@ -154,9 +151,8 @@ namespace Launchpad.NET
             switch (args.Message)
             {
                 case MidiNoteOnMessage onMessage:
-                    BackgroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
-                    ForegroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
-                    InteractionEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
+                    GridBackgroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
+                    GridForegroundEffects.ForEach(effect => SetButtonColor(effect.ProcessInput(onMessage.Note)));
                     break;
                 case MidiControlChangeMessage changeMessage:
                     // Top row
@@ -189,9 +185,13 @@ namespace Launchpad.NET
 
         void Update(object state)
         {
-            BackgroundEffects.ForEach(effect => SetButtonColor(effect.Update()));
-            ForegroundEffects.ForEach(effect => SetButtonColor(effect.Update()));
-            InteractionEffects.ForEach(effect => SetButtonColor(effect.Update()));
+            GridBackgroundEffects.ForEach(effect => UpdateGrid(effect.Update()));
+            GridForegroundEffects.ForEach(effect => UpdateGrid(effect.Update()));
+        }
+
+        void UpdateGrid(List<LaunchpadButton> launchpadButtons)
+        {
+            launchpadButtons.ForEach(button => GridButtons.)
         }
     }
 }

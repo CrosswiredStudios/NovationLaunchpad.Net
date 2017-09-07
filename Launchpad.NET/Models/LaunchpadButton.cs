@@ -10,7 +10,7 @@ namespace Launchpad.NET.Models
     public class LaunchpadButton
     {
         Launchpad.LaunchpadColor color;
-        IMidiOutPort outPort;
+        readonly IMidiOutPort outPort;
 
         public Launchpad.LaunchpadColor Color
         {
