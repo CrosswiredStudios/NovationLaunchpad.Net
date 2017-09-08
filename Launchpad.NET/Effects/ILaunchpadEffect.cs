@@ -11,9 +11,9 @@ namespace Launchpad.NET.Effects
     {
         event EventHandler OnCompleted;
         void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons);
-        void ProcessInput(ILaunchpadButton button, List<LaunchpadButton> grid);
-        void ProcessInput(byte buttonPressedId, List<LaunchpadTopButton> top);
-        List<LaunchpadButton> Update();
+        void ProcessInput(ILaunchpadButton button);
+        void ProcessInput(byte buttonPressedId);
+        void Update();
         TimeSpan UpdateFrequency { get; }
     }
 }
