@@ -7,14 +7,7 @@ using Windows.Devices.Midi;
 
 namespace Launchpad.NET.Models
 {
-    public interface ILaunchpadButton
-    {
-        Launchpad.LaunchpadColor Color { get; set; }
-        byte Id { get; set; }
-        bool IsPressed { get; set; }
-    }
-
-    public class LaunchpadButton : ILaunchpadButton
+    public class LaunchpadTopButton
     {
         Launchpad.LaunchpadColor color;
         readonly IMidiOutPort outPort;
@@ -24,28 +17,24 @@ namespace Launchpad.NET.Models
             get => color;
             set
             {
-                outPort?.SendMessage(new MidiNoteOnMessage(0, Id, (byte)Color));
+                outPort?.SendMessage(new MidiControlChangeMessage(0, Id, (byte)Color));
                 color = value;
             }
         }
 
         public byte Id { get; set; }
 
-        public LaunchpadButton(byte id, Launchpad.LaunchpadColor color)
+        public LaunchpadTopButton(byte id, Launchpad.LaunchpadColor color)
         {
             Id = id;
             Color = color;
-            IsPressed = false;
         }
 
-        public LaunchpadButton(byte id, Launchpad.LaunchpadColor color, IMidiOutPort outPort)
+        public LaunchpadTopButton(byte id, Launchpad.LaunchpadColor color, IMidiOutPort outPort)
         {
             this.outPort = outPort;
             Id = id;
             Color = color;
-            IsPressed = false;
         }
-
-        public bool IsPressed { get; set; }
     }
 }

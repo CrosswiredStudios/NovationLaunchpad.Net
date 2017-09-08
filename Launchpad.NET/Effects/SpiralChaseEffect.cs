@@ -41,63 +41,28 @@ namespace Launchpad.NET.Effects
 
         public List<LaunchpadButton> Initiate()
         {
-            x = 0;
-            y = 0;
-
-            lastLastButton = new LaunchpadButton() { Color = Launchpad.LaunchpadColor.Off, Id = 0 };
-            lastButton = new LaunchpadButton() { Color = Launchpad.LaunchpadColor.GreenFull, Id = 0 };
+            actorLocation = config.StartLocation;
+            
 
             return new List<LaunchpadButton>()
             {
-                lastButton
+
             };
         }
 
-        public List<LaunchpadButton> ProcessInput(byte pressedButtonId)
+        public void ProcessInput(byte pressedButtonId, List<LaunchpadButton> grid)
         {
-            return new List<LaunchpadButton>();
+            
+        }
+
+        public void ProcessInput(byte buttonPressedId, List<LaunchpadTopButton> top)
+        {
+            
         }
 
         public List<LaunchpadButton> Update()
         {
-            x++;
-            if (x > 7)
-            {
-                x = 0;
-                y++;
-                if (y > 7)
-                {
-                    y = 0;
-                }
-            }
-
-            var updatedLastLastButton = new LaunchpadButton()
-            {
-                Color = Launchpad.LaunchpadColor.Off,
-                Id = lastLastButton.Id
-            };
-
-            var updatedLastButton = new LaunchpadButton()
-            {
-                Color = Launchpad.LaunchpadColor.GreenLow,
-                Id = lastButton.Id
-            };
-
-            var newButton = new LaunchpadButton()
-            {
-                Color = Launchpad.LaunchpadColor.GreenFull,
-                Id = (byte)((y * 16) + x)
-            };
-
-            lastLastButton = lastButton;
-            lastButton = newButton;
-
-            return new List<LaunchpadButton>()
-            {
-                updatedLastLastButton,
-                updatedLastButton,
-                newButton
-            };
+            return new List<LaunchpadButton>();
         }
     }    
 }

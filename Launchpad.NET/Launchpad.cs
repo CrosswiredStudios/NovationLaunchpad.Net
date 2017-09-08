@@ -40,6 +40,8 @@ namespace Launchpad.NET
         }
 
         List<LaunchpadButton> GridButtons;
+        List<LaunchpadButton> SideButtons;
+        List<LaunchpadTopButton> TopButtons;
         bool initiated;
         MidiInPort inPort;
         readonly string name;
@@ -69,6 +71,8 @@ namespace Launchpad.NET
 
             this.name = name;
             GridButtons = new List<LaunchpadButton>();
+            SideButtons = new List<LaunchpadButton>();
+            TopButtons = new List<LaunchpadTopButton>();
             GridBackgroundEffects = new List<ILaunchpadEffect>();
             GridForegroundEffects = new List<ILaunchpadEffect>();
         }
@@ -131,11 +135,21 @@ namespace Launchpad.NET
             {
                 GridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
             }
-            
+
+            // Create all the side buttons
+            for (var x = 8; x < 120; x+=16)
+            {
+                SideButtons.Add(new  LaunchpadButton((byte)x, LaunchpadColor.Off, outPort));        
+            }
+
+            // Create all the top buttons            
+            for(var x = 104; x < 111; x++)
+                TopButtons.Add(new LaunchpadTopButton((byte)x, LaunchpadColor.Off, outPort));
+
             initiated = true;
 
             // Start the update timer (10ms resolution)
-            updateTimer = new Timer(Update, null, 0, 10);
+            updateTimer = new Timer(Update, null, 0, 50);
 
         }
 
@@ -149,12 +163,16 @@ namespace Launchpad.NET
             // Determine what kind of message it is
             switch (args.Message)
             {
-                case MidiNoteOnMessage onMessage:
-                    GridBackgroundEffects.ForEach(effect => UpdateGrid(effect.ProcessInput(onMessage.Note)));
-                    GridForegroundEffects.ForEach(effect => UpdateGrid(effect.ProcessInput(onMessage.Note)));
+                case MidiNoteOnMessage onMessage: // Grid and side buttons come as Midi Note On Message
+                    var gridButton = GridButtons.FirstOrDefault(button => button.Id == onMessage.Note);
+                    if (gridButton == null) return;
+                    gridButton.IsPressed = !gridButton.IsPressed;
+                    GridBackgroundEffects.ForEach(effect => effect.ProcessInput(gridButton, GridButtons));
+                    GridForegroundEffects.ForEach(effect => effect.ProcessInput(gridButton, GridButtons));                    
                     break;
-                case MidiControlChangeMessage changeMessage:
-                    // Top row
+                case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
+                    GridBackgroundEffects.ForEach(effect => effect.ProcessInput(changeMessage.Controller, TopButtons));
+                    GridForegroundEffects.ForEach(effect => effect.ProcessInput(changeMessage.Controller, TopButtons));                    
                     break;
             }
 
@@ -162,13 +180,13 @@ namespace Launchpad.NET
 
         public void RegisterGridBackgroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
         {
-            effect.Initiate();
+            effect.Initiate(GridButtons, SideButtons, TopButtons);
             GridBackgroundEffects.Add(effect);
         }
 
         public void RegisterForegroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
         {
-            effect.Initiate();
+            effect.Initiate(GridButtons, SideButtons, TopButtons);
             GridBackgroundEffects.Add(effect);
         }
 
@@ -181,16 +199,8 @@ namespace Launchpad.NET
 
         void Update(object state)
         {
-            GridBackgroundEffects.ForEach(effect => UpdateGrid(effect.Update()));
-            GridForegroundEffects.ForEach(effect => UpdateGrid(effect.Update()));
-        }
-
-        void UpdateGrid(List<LaunchpadButton> buttonUpdates)
-        {
-            buttonUpdates.ForEach(buttonUpdate =>
-            {
-                GridButtons.FirstOrDefault(button => button.Id == buttonUpdate.Id).Color = buttonUpdate.Color;
-            });
+            GridBackgroundEffects.ForEach(effect => effect.Update());
+            GridForegroundEffects.ForEach(effect => effect.Update());
         }
     }
 }
