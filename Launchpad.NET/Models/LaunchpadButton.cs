@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Devices.Midi;
+﻿using Windows.Devices.Midi;
 
 namespace Launchpad.NET.Models
 {
+    public enum LaunchpadButtonState
+    {
+        Pressed,
+        Released
+    }
+
     public interface ILaunchpadButton
     {
-        Launchpad.LaunchpadColor Color { get; set; }
+        LaunchpadColor Color { get; set; }
         byte Id { get; set; }
-        bool IsPressed { get; set; }
+        LaunchpadButtonState State { get; set; }
     }
 
     public class LaunchpadButton : ILaunchpadButton
     {
-        Launchpad.LaunchpadColor color;
+        LaunchpadColor color;
         readonly IMidiOutPort outPort;
 
-        public Launchpad.LaunchpadColor Color
+        public LaunchpadColor Color
         {
             get => color;
             set
@@ -31,21 +32,21 @@ namespace Launchpad.NET.Models
 
         public byte Id { get; set; }
 
-        public LaunchpadButton(byte id, Launchpad.LaunchpadColor color)
+        public LaunchpadButton(byte id, LaunchpadColor color)
         {
             Id = id;
             Color = color;
-            IsPressed = false;
+            State = LaunchpadButtonState.Released;
         }
 
-        public LaunchpadButton(byte id, Launchpad.LaunchpadColor color, IMidiOutPort outPort)
+        public LaunchpadButton(byte id, LaunchpadColor color, IMidiOutPort outPort)
         {
             this.outPort = outPort;
             Id = id;
             Color = color;
-            IsPressed = false;
+            State = LaunchpadButtonState.Released;
         }
 
-        public bool IsPressed { get; set; }
+        public LaunchpadButtonState State { get; set; }
     }
 }

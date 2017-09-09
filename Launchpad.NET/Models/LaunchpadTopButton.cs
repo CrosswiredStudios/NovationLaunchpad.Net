@@ -7,12 +7,12 @@ using Windows.Devices.Midi;
 
 namespace Launchpad.NET.Models
 {
-    public class LaunchpadTopButton
+    public class LaunchpadTopButton : ILaunchpadButton
     {
-        Launchpad.LaunchpadColor color;
+        LaunchpadColor color;
         readonly IMidiOutPort outPort;
 
-        public Launchpad.LaunchpadColor Color
+        public LaunchpadColor Color
         {
             get => color;
             set
@@ -23,14 +23,15 @@ namespace Launchpad.NET.Models
         }
 
         public byte Id { get; set; }
+        public LaunchpadButtonState State { get; set; }
 
-        public LaunchpadTopButton(byte id, Launchpad.LaunchpadColor color)
+        public LaunchpadTopButton(byte id, LaunchpadColor color)
         {
             Id = id;
             Color = color;
         }
 
-        public LaunchpadTopButton(byte id, Launchpad.LaunchpadColor color, IMidiOutPort outPort)
+        public LaunchpadTopButton(byte id, LaunchpadColor color, IMidiOutPort outPort)
         {
             this.outPort = outPort;
             Id = id;

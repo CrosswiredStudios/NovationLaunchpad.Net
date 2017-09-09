@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,46 +22,44 @@ using Launchpad.NET.Models;
 namespace Launchpad.NET
 {
     /// <summary>
+    /// Colors supported by the Launchpad
+    /// </summary>
+    public enum LaunchpadColor
+    {
+        Off = 12,
+        AmberLow = 29,
+        AmberFull = 63,
+        GreenLow = 28,
+        GreenFull = 60,
+        RedLow = 13,
+        RedFull = 15,
+        Yellow = 62,
+    }
+
+    /// <summary>
     /// Novation Launchpad .NET Interface
     /// </summary>
     public class Launchpad
     {
-        /// <summary>
-        /// Colors supported by the Launchpad
-        /// </summary>
-        public enum LaunchpadColor
-        {
-            Off = 12,
-            AmberLow = 29,
-            AmberFull = 63,
-            GreenLow = 28,
-            GreenFull = 60,
-            RedLow = 13,
-            RedFull = 15,
-            Yellow = 62,
-        }
-
         List<LaunchpadButton> GridButtons;
+        List<ILaunchpadEffect> effects;
+        Dictionary<ILaunchpadEffect, IDisposable> effectsDisposables;
+        readonly Dictionary<ILaunchpadEffect, Timer> effectsTimers;        
         List<LaunchpadButton> SideButtons;
         List<LaunchpadTopButton> TopButtons;
         bool initiated;
         MidiInPort inPort;
         readonly string name;
         IMidiOutPort outPort;
-        Timer updateTimer;
-
         List<LaunchpadButton> sideColumn;
         List<LaunchpadButton> topRow;
+        Timer updateTimer;        
+        readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();       
 
         /// <summary>
-        /// Launchpad effects to run on the main grid as the background
+        /// Observable event for when a button on the launchpad is pressed or released
         /// </summary>
-        public List<ILaunchpadEffect> GridBackgroundEffects { get; set; }
-
-        /// <summary>
-        /// Launchpad effects to run on the main grid as the foreground
-        /// </summary>
-        public List<ILaunchpadEffect> GridForegroundEffects { get; set; }
+        public IObservable<ILaunchpadButton> WhenButtonStateChanged => whenButtonStateChanged;
 
         /// <summary>
         /// Create a launchpad instance
@@ -70,11 +70,12 @@ namespace Launchpad.NET
             initiated = false;
 
             this.name = name;
+            effectsDisposables = new Dictionary<ILaunchpadEffect, IDisposable>();
+            effectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
             GridButtons = new List<LaunchpadButton>();
             SideButtons = new List<LaunchpadButton>();
             TopButtons = new List<LaunchpadTopButton>();
-            GridBackgroundEffects = new List<ILaunchpadEffect>();
-            GridForegroundEffects = new List<ILaunchpadEffect>();
+            effects = new List<ILaunchpadEffect>();            
         }
 
         /// <summary>
@@ -94,63 +95,67 @@ namespace Launchpad.NET
         /// </summary>
         public async void Initiate()
         {
-            // Get all output MIDI devices
-            string midiOutportQueryString = MidiOutPort.GetDeviceSelector();
-            DeviceInformationCollection midiOutputDevices = await DeviceInformation.FindAllAsync(midiOutportQueryString);
-
-            // Find the launchpad using the given name
-            foreach (DeviceInformation deviceInfo in midiOutputDevices)
+            try
             {
-                if (deviceInfo.Name.ToLower().Contains(name.ToLower()))
+                // Get all output MIDI devices
+                string midiOutportQueryString = MidiOutPort.GetDeviceSelector();
+                DeviceInformationCollection midiOutputDevices = await DeviceInformation.FindAllAsync(midiOutportQueryString);
+
+                // Find the launchpad using the given name
+                foreach (DeviceInformation deviceInfo in midiOutputDevices)
                 {
-                    outPort = await MidiOutPort.FromIdAsync(deviceInfo.Id);
-                }
-            }
-
-            // Get all input MIDI devices
-            string midiInputQueryString = MidiInPort.GetDeviceSelector();
-            DeviceInformationCollection midiInputDevices = await DeviceInformation.FindAllAsync(midiInputQueryString);
-
-            // Find the launchpad
-            foreach (DeviceInformation deviceInfo in midiInputDevices)
-            {
-                if (deviceInfo.Name.ToLower().Contains(name.ToLower()))
-                {
-                    inPort = await MidiInPort.FromIdAsync(deviceInfo.Id);
-
-                    if (inPort == null)
+                    if (deviceInfo.Name.ToLower().Contains(name.ToLower()))
                     {
-                        System.Diagnostics.Debug.WriteLine("Unable to create MidiInPort from input device");
-                        return;
+                        outPort = await MidiOutPort.FromIdAsync(deviceInfo.Id);
                     }
-
-                    // When we receive a message from the launchpad
-                    inPort.MessageReceived += InPort_MessageReceived;
                 }
-            }
 
-            // Create all the grid buttons            
-            for (var y = 0; y < 8; y++)
-            for (var x = 0; x < 8; x++)
+                // Get all input MIDI devices
+                string midiInputQueryString = MidiInPort.GetDeviceSelector();
+                DeviceInformationCollection midiInputDevices = await DeviceInformation.FindAllAsync(midiInputQueryString);
+
+                // Find the launchpad
+                foreach (DeviceInformation deviceInfo in midiInputDevices)
+                {
+                    if (deviceInfo.Name.ToLower().Contains(name.ToLower()))
+                    {
+                        inPort = await MidiInPort.FromIdAsync(deviceInfo.Id);
+
+                        if (inPort == null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Unable to create MidiInPort from input device");
+                            return;
+                        }
+
+                        // When we receive a message from the launchpad
+                        inPort.MessageReceived += InPort_MessageReceived;
+                    }
+                }
+
+                // Create all the grid buttons            
+                for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                {
+                    GridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
+                }
+
+                // Create all the side buttons
+                for (var x = 8; x < 120; x += 16)
+                {
+                    SideButtons.Add(new LaunchpadButton((byte)x, LaunchpadColor.Off, outPort));
+                }
+
+                // Create all the top buttons            
+                for (var x = 104; x < 111; x++)
+                    TopButtons.Add(new LaunchpadTopButton((byte)x, LaunchpadColor.Off, outPort));
+
+                // We're done initiating!
+                initiated = true;
+            }
+            catch (Exception e)
             {
-                GridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
-            }
-
-            // Create all the side buttons
-            for (var x = 8; x < 120; x+=16)
-            {
-                SideButtons.Add(new  LaunchpadButton((byte)x, LaunchpadColor.Off, outPort));        
-            }
-
-            // Create all the top buttons            
-            for(var x = 104; x < 111; x++)
-                TopButtons.Add(new LaunchpadTopButton((byte)x, LaunchpadColor.Off, outPort));
-
-            initiated = true;
-
-            // Start the update timer (10ms resolution)
-            updateTimer = new Timer(Update, null, 0, 50);
-
+                Debug.WriteLine(e);
+            }           
         }
 
         /// <summary>
@@ -164,30 +169,70 @@ namespace Launchpad.NET
             switch (args.Message)
             {
                 case MidiNoteOnMessage onMessage: // Grid and side buttons come as Midi Note On Message
+
+                    // Get a reference to the button
                     var gridButton = GridButtons.FirstOrDefault(button => button.Id == onMessage.Note);
+
+                    // If the grid button could not be found (should never happen), return
                     if (gridButton == null) return;
-                    gridButton.IsPressed = !gridButton.IsPressed;
-                    GridBackgroundEffects.ForEach(effect => effect.ProcessInput(gridButton, GridButtons));
-                    GridForegroundEffects.ForEach(effect => effect.ProcessInput(gridButton, GridButtons));                    
+
+                    // Update the state (Launchpad sends midi on message for press and release - Velocity 0 is released, 127 is pressed)
+                    gridButton.State = onMessage.Velocity == 0
+                        ? LaunchpadButtonState.Released
+                        : LaunchpadButtonState.Pressed;
+
+                    // Notify any observable subscribers of the event
+                    whenButtonStateChanged.OnNext(gridButton);               
                     break;
                 case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
-                    GridBackgroundEffects.ForEach(effect => effect.ProcessInput(changeMessage.Controller, TopButtons));
-                    GridForegroundEffects.ForEach(effect => effect.ProcessInput(changeMessage.Controller, TopButtons));                    
+                                 
                     break;
             }
-
         }
 
-        public void RegisterGridBackgroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
+        /// <summary>
+        /// Add an effect to the launchpad
+        /// </summary>
+        /// <param name="effect"></param>
+        /// <param name="updateFrequency"></param>
+        public void RegisterEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
         {
-            effect.Initiate(GridButtons, SideButtons, TopButtons);
-            GridBackgroundEffects.Add(effect);
+            try
+            { 
+                // Add the effect to the launchpad
+                effects.Add(effect);
+
+                // When the effect is complete, unregister it (add the subscription to a dictionary so we can make sure to release it later)
+                effectsDisposables.Add(effect,
+                    effect
+                        .WhenComplete
+                        .Subscribe(UnregisterEffect));
+
+                // Initiate the effect (provide all buttons and button changed event
+                effect.Initiate(GridButtons, SideButtons, TopButtons, WhenButtonStateChanged);
+
+                // Create an update timer at the specified frequency
+                effectsTimers.Add(effect, new Timer(_=>effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
-        public void RegisterForegroundEffect(ILaunchpadEffect effect, TimeSpan updateFrequency)
+        public void SendControlChangeMessage(MidiControlChangeMessage message)
         {
-            effect.Initiate(GridButtons, SideButtons, TopButtons);
-            GridBackgroundEffects.Add(effect);
+            outPort.SendMessage(message);
+        }
+
+        public void SendMidiOffMessage(MidiNoteOffMessage message)
+        {
+            outPort.SendMessage(message);
+        }
+
+        public void SendMidiOnMessage(MidiNoteOnMessage message)
+        {
+            outPort.SendMessage(message);
         }
 
         public void SetButtonColor(int x, int y, LaunchpadColor color)
@@ -195,12 +240,31 @@ namespace Launchpad.NET
             IMidiMessage midiMessageToSend = new MidiNoteOnMessage(0, (byte)(16 * y + x), (byte)color);
 
             outPort.SendMessage(midiMessageToSend);
+
+            outPort.SendMessage(new MidiControlChangeMessage(0, (byte)(20 * y + x), 0));
         }
 
-        void Update(object state)
+        /// <summary>
+        /// Removes an effect from the launchpad
+        /// </summary>
+        /// <param name="effect">The effect to remove.</param>
+        public void UnregisterEffect(ILaunchpadEffect effect)
         {
-            GridBackgroundEffects.ForEach(effect => effect.Update());
-            GridForegroundEffects.ForEach(effect => effect.Update());
+            try
+            {
+                // Dispose of the update timer for the effect
+                effectsTimers[effect]?.Dispose();
+
+                // Dispose of the OnComplete subscription
+                effectsDisposables[effect]?.Dispose();
+
+                // Remove the effect from the launchpad
+                effects.Remove(effect);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
     }
 }

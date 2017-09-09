@@ -7,13 +7,20 @@ using Launchpad.NET.Models;
 
 namespace Launchpad.NET.Effects
 {
+    public enum LaunchPadEffectLayer
+    {
+        Background,
+        Foreground
+    }
+
     public interface ILaunchpadEffect
     {
-        event EventHandler OnCompleted;
-        void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons);
+        LaunchPadEffectLayer Layer { get; set; }
+        IObservable<ILaunchpadEffect> WhenComplete { get; set; }
+        void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons, IObservable<ILaunchpadButton> whenButtonStateChanged);
         void ProcessInput(ILaunchpadButton button);
         void ProcessInput(byte buttonPressedId);
         void Update();
-        TimeSpan UpdateFrequency { get; }
+        
     }
 }
