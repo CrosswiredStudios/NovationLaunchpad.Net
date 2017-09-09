@@ -15,11 +15,8 @@ namespace Launchpad.NET.Effects
 
     public interface ILaunchpadEffect
     {
-        LaunchPadEffectLayer Layer { get; set; }
-        IObservable<ILaunchpadEffect> WhenComplete { get; set; }
+        IObservable<ILaunchpadEffect> WhenComplete { get; }
         void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons, IObservable<ILaunchpadButton> whenButtonStateChanged);
-        void ProcessInput(ILaunchpadButton button);
-        void ProcessInput(byte buttonPressedId);
         void Update();
         
     }

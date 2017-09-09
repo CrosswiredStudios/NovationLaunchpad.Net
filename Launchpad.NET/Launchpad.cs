@@ -170,6 +170,8 @@ namespace Launchpad.NET
             {
                 case MidiNoteOnMessage onMessage: // Grid and side buttons come as Midi Note On Message
 
+                    Debug.WriteLine($"Grid ({onMessage.Note % 16}, {(int)(onMessage.Note / 16)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
+
                     // Get a reference to the button
                     var gridButton = GridButtons.FirstOrDefault(button => button.Id == onMessage.Note);
 
@@ -205,11 +207,11 @@ namespace Launchpad.NET
                 // When the effect is complete, unregister it (add the subscription to a dictionary so we can make sure to release it later)
                 effectsDisposables.Add(effect,
                     effect
-                        .WhenComplete
+                        .WhenComplete? // If the effect has implemented whenComplete
                         .Subscribe(UnregisterEffect));
 
                 // Initiate the effect (provide all buttons and button changed event
-                effect.Initiate(GridButtons, SideButtons, TopButtons, WhenButtonStateChanged);
+                effect.Initiate(GridButtons, SideButtons, TopButtons, whenButtonStateChanged);
 
                 // Create an update timer at the specified frequency
                 effectsTimers.Add(effect, new Timer(_=>effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
@@ -220,28 +222,24 @@ namespace Launchpad.NET
             }
         }
 
-        public void SendControlChangeMessage(MidiControlChangeMessage message)
+        /// <summary>
+        /// Sends a MIDI message to the Launchpad
+        /// </summary>
+        /// <param name="message">The MIDI message to send.</param>
+        public void SendMessage(IMidiMessage message)
         {
             outPort.SendMessage(message);
         }
 
-        public void SendMidiOffMessage(MidiNoteOffMessage message)
-        {
-            outPort.SendMessage(message);
-        }
-
-        public void SendMidiOnMessage(MidiNoteOnMessage message)
-        {
-            outPort.SendMessage(message);
-        }
-
+        /// <summary>
+        /// Sets the color of the specified grid button
+        /// </summary>
+        /// <param name="x">X coordinate, should be 0-7.</param>
+        /// <param name="y">Y coordinate, should be 0-7.</param>
+        /// <param name="color">The color to set the button to.</param>
         public void SetButtonColor(int x, int y, LaunchpadColor color)
         {
-            IMidiMessage midiMessageToSend = new MidiNoteOnMessage(0, (byte)(16 * y + x), (byte)color);
-
-            outPort.SendMessage(midiMessageToSend);
-
-            outPort.SendMessage(new MidiControlChangeMessage(0, (byte)(20 * y + x), 0));
+            SendMessage(new MidiNoteOnMessage(0, (byte)(16 * y + x), (byte)color));
         }
 
         /// <summary>

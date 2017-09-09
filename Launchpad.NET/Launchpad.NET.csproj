@@ -106,6 +106,8 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Effects\ClearGridEffect.cs" />
+    <Compile Include="Effects\EqualizerEffect.cs" />
     <Compile Include="Effects\ILaunchpadEffect.cs" />
     <Compile Include="Launchpad.cs" />
     <Compile Include="Models\LaunchpadButton.cs" />
