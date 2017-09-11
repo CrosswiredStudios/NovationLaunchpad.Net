@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,19 +13,28 @@ namespace Launchpad.NET.Effects
     public class EqualizerEffect : ILaunchpadEffect
     {
 
-
         List<LaunchpadButton> gridButtons;
         List<LaunchpadButton> sideButtons;
         List<LaunchpadTopButton> topButtons;
         List<LaunchpadColor> horizontalColorKey;
         LaunchpadColor[] verticalColorkey;
         readonly Subject<ILaunchpadEffect> whenComplete = new Subject<ILaunchpadEffect>();
+        CompositeDisposable subscriptions;
 
         public LaunchPadEffectLayer Layer { get; set; }
+
+        public string Name
+        {
+            get { return "Equalizer"; }
+            set { }
+        } 
+
         public IObservable<ILaunchpadEffect> WhenComplete => whenComplete;
 
         public void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons, IObservable<ILaunchpadButton> whenButtonStateChanged)
         {
+            subscriptions = new CompositeDisposable();
+
             this.gridButtons = gridButtons;
             this.sideButtons = sideButtons;
             this.topButtons = topButtons;
@@ -41,8 +51,15 @@ namespace Launchpad.NET.Effects
                 LaunchpadColor.RedFull
             };
 
-            whenButtonStateChanged
-                .Subscribe(ProcessInput);
+            subscriptions.Add(
+                whenButtonStateChanged
+                    .Subscribe(ProcessInput));
+        }
+
+        public void Terminate()
+        {
+            subscriptions?.Dispose();
+            whenComplete.OnNext(this);
         }
 
         public void ProcessInput(ILaunchpadButton button)

@@ -109,6 +109,8 @@
     <Compile Include="Effects\ClearGridEffect.cs" />
     <Compile Include="Effects\EqualizerEffect.cs" />
     <Compile Include="Effects\ILaunchpadEffect.cs" />
+    <Compile Include="LaunchpadS.cs" />
+    <Compile Include="LaunchpadMk2.cs" />
     <Compile Include="Launchpad.cs" />
     <Compile Include="Models\LaunchpadButton.cs" />
     <Compile Include="Models\LaunchpadButtonCommand.cs" />

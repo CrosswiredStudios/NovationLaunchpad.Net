@@ -10,6 +10,12 @@ namespace Launchpad.NET.Effects
 {
     public class ClearGridEffect : ILaunchpadEffect
     {
+        public string Name
+        {
+            get { return "Clear"; }
+            set { }
+        }
+
         readonly Subject<ILaunchpadEffect> whenComplete = new Subject<ILaunchpadEffect>();
 
         public IObservable<ILaunchpadEffect> WhenComplete => whenComplete;
@@ -17,6 +23,11 @@ namespace Launchpad.NET.Effects
         {        
             // Clear all the buttons
             gridButtons.ForEach(button=>button.Color = LaunchpadColor.Off);
+            whenComplete.OnNext(this);
+        }
+
+        public void Terminate()
+        {
             whenComplete.OnNext(this);
         }
 
