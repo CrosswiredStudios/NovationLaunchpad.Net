@@ -12,6 +12,8 @@ namespace Launchpad.NET.Models
         LaunchpadColor color;
         readonly IMidiOutPort outPort;
 
+        public byte Channel { get; set; }
+
         public LaunchpadColor Color
         {
             get => color;

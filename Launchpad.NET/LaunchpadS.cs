@@ -9,10 +9,7 @@ using Windows.Devices.Midi;
 using Launchpad.NET.Effects;
 using Launchpad.NET.Models;
 
-/* 
- * Information for Uwp handling of MIDI devices
- * https://docs.microsoft.com/en-us/windows/uwp/audio-video-camera/midi
- * 
+/*  
  * Information for launchpad programming
  * https://d2xhy469pqj8rc.cloudfront.net/sites/default/files/novation/downloads/4080/launchpad-programmers-reference.pdf
  */
@@ -67,13 +64,13 @@ namespace Launchpad.NET
             for (var y = 0; y < 8; y++)
             for (var x = 0; x < 8; x++)
             {
-                gridButtons.Add(new LaunchpadButton((byte)(y * 16 + x), LaunchpadColor.Off, outPort));
+                gridButtons.Add(new LaunchpadButton((byte)0, (byte)(y * 16 + x), LaunchpadColor.Off, outPort));
             }
 
             // Create all the side buttons
             for (var x = 8; x < 120; x += 16)
             {
-                sideButtons.Add(new LaunchpadButton((byte)x, LaunchpadColor.Off, outPort));
+                sideButtons.Add(new LaunchpadButton((byte)0, (byte)x, LaunchpadColor.Off, outPort));
             }
 
             // Create all the top buttons            
