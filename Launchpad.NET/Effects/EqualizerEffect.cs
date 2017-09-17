@@ -71,7 +71,7 @@ namespace Launchpad.NET.Effects
                     var clearIndex = button.Id - 16;
                     while (clearIndex >= 0)
                     {
-                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = LaunchpadColor.Off;
+                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = (byte)LaunchpadColor.Off;
                         clearIndex -= 16;
                     }
 
@@ -79,7 +79,7 @@ namespace Launchpad.NET.Effects
                     var lightIndex = button.Id;
                     while (lightIndex < 127)
                     {
-                        gridButtons.FirstOrDefault(b => b.Id == lightIndex).Color = horizontalColorKey[button.Id % 16];
+                        gridButtons.FirstOrDefault(b => b.Id == lightIndex).Color = (byte)horizontalColorKey[button.Id % 16];
                         lightIndex += 16;
                     }
                     break;
@@ -119,9 +119,9 @@ namespace Launchpad.NET.Effects
         {
             for (var x = column; x < 64; x += 8)
             {
-                if (gridButtons[x].Color == LaunchpadColor.Off) continue;
+                if (gridButtons[x].Color == (byte)LaunchpadColor.Off) continue;
 
-                gridButtons[x].Color = horizontalColorKey[column];
+                gridButtons[x].Color = (byte)horizontalColorKey[column];
             }
         }
     }

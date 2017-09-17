@@ -11,19 +11,19 @@ namespace Launchpad.NET.Models
     public interface ILaunchpadButton
     {
         byte Channel { get; set; }
-        LaunchpadColor Color { get; set; }
+        byte Color { get; set; }
         byte Id { get; set; }
         LaunchpadButtonState State { get; set; }
     }
 
     public class LaunchpadButton : ILaunchpadButton
     {        
-        LaunchpadColor color;
+        byte color;
         readonly IMidiOutPort outPort;
 
         public byte Channel { get; set; }
 
-        public LaunchpadColor Color
+        public byte Color
         {
             get => color;
             set
@@ -35,7 +35,7 @@ namespace Launchpad.NET.Models
 
         public byte Id { get; set; }
 
-        public LaunchpadButton(byte channel, byte id, LaunchpadColor color)
+        public LaunchpadButton(byte channel, byte id, byte color)
         {
             this.color = color;
             Channel = channel;            
@@ -43,7 +43,7 @@ namespace Launchpad.NET.Models
             State = LaunchpadButtonState.Released;
         }
 
-        public LaunchpadButton(byte channel, byte id, LaunchpadColor color, IMidiOutPort outPort)
+        public LaunchpadButton(byte channel, byte id, byte color, IMidiOutPort outPort)
         {
             this.color = color;
             this.outPort = outPort;

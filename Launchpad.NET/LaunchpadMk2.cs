@@ -13,7 +13,7 @@ using Launchpad.NET.Models;
 
 namespace Launchpad.NET
 {
-    public enum LaunchpadMK2Color
+    public enum LaunchpadMK2Color : byte
     {
         Off = 0,
         Black = 1,
@@ -39,23 +39,24 @@ namespace Launchpad.NET
             this.outPort = outPort;            
             Effects = new ObservableCollection<ILaunchpadEffect>();
             gridButtons = new List<LaunchpadButton>();
-            sideButtons = new List<LaunchpadButton>();
             topButtons = new List<LaunchpadTopButton>();
 
             // Create all the grid buttons            
             for (var y = 1; y <= 8; y++)
-            for (var x = 1; x <= 8; x++)
+            for (var x = 1; x <= 9; x++)
             {
-            }
-
-            // Create all the side buttons
-            for (var x = 8; x < 120; x += 16)
-            {
+                    gridButtons.Add(new LaunchpadButton(0, (byte)(int.Parse(y.ToString() + x.ToString())), (byte)LaunchpadMK2Color.Off, outPort));
             }
 
             // Create all the top buttons            
             for (var x = 104; x < 111; x++)
-                topButtons.Add(new LaunchpadTopButton((byte)x, LaunchpadColor.Off, outPort));
+                topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
+
+            for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                {
+                    SetButtonColor(x, y, LaunchpadColor.Off);
+                }
 
             // Process messages from device
             inPort.MessageReceived += InPort_MessageReceived;

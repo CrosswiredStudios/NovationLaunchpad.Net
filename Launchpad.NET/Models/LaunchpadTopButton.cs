@@ -9,12 +9,12 @@ namespace Launchpad.NET.Models
 {
     public class LaunchpadTopButton : ILaunchpadButton
     {
-        LaunchpadColor color;
+        byte color;
         readonly IMidiOutPort outPort;
 
         public byte Channel { get; set; }
 
-        public LaunchpadColor Color
+        public byte Color
         {
             get => color;
             set
@@ -27,13 +27,13 @@ namespace Launchpad.NET.Models
         public byte Id { get; set; }
         public LaunchpadButtonState State { get; set; }
 
-        public LaunchpadTopButton(byte id, LaunchpadColor color)
+        public LaunchpadTopButton(byte id, byte color)
         {
             Id = id;
             Color = color;
         }
 
-        public LaunchpadTopButton(byte id, LaunchpadColor color, IMidiOutPort outPort)
+        public LaunchpadTopButton(byte id, byte color, IMidiOutPort outPort)
         {
             this.outPort = outPort;
             Id = id;

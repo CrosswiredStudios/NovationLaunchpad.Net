@@ -30,6 +30,12 @@ namespace Launchpad.NET
         /// </summary>
         public IObservable<ILaunchpadButton> WhenButtonStateChanged => whenButtonStateChanged;
 
+        public Launchpad()
+        {
+            effectsDisposables = new Dictionary<ILaunchpadEffect, IDisposable>();
+            effectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
+        }
+
         /// <summary>
         /// Add an effect to the launchpad
         /// </summary>

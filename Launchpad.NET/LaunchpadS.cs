@@ -19,7 +19,7 @@ namespace Launchpad.NET
     /// <summary>
     /// Colors supported by the Launchpad
     /// </summary>
-    public enum LaunchpadColor
+    public enum LaunchpadColor : byte
     {
         Off = 12,
         AmberLow = 29,
@@ -64,18 +64,18 @@ namespace Launchpad.NET
             for (var y = 0; y < 8; y++)
             for (var x = 0; x < 8; x++)
             {
-                gridButtons.Add(new LaunchpadButton((byte)0, (byte)(y * 16 + x), LaunchpadColor.Off, outPort));
+                gridButtons.Add(new LaunchpadButton((byte)0, (byte)(y * 16 + x), (byte)LaunchpadColor.Off, outPort));
             }
 
             // Create all the side buttons
             for (var x = 8; x < 120; x += 16)
             {
-                sideButtons.Add(new LaunchpadButton((byte)0, (byte)x, LaunchpadColor.Off, outPort));
+                sideButtons.Add(new LaunchpadButton((byte)0, (byte)x, (byte)LaunchpadColor.Off, outPort));
             }
 
             // Create all the top buttons            
             for (var x = 104; x < 111; x++)
-                topButtons.Add(new LaunchpadTopButton((byte)x, LaunchpadColor.Off, outPort));
+                topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
 
             // Process messages from device
             inPort.MessageReceived += InPort_MessageReceived;
