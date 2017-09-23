@@ -55,7 +55,7 @@ namespace Launchpad.NET
             for (var y = 1; y <= 8; y++)
                 for (var x = 1; x <= 9; x++)
                 {
-                    SetButtonColor(x, y, (byte)LaunchpadMK2Color.Maroon);
+                    SetButtonColor(x, y, (byte)LaunchpadMK2Color.Off);
                 }
 
             // Process messages from device
@@ -103,7 +103,7 @@ namespace Launchpad.NET
 
         public override void SetButtonColor(int x, int y, byte color)
         {
-            SendMessage(new MidiNoteOnMessage(0, (byte)(int.Parse(y.ToString() + xs.ToString())), (byte)color));
+            SendMessage(new MidiNoteOnMessage(0, (byte)(int.Parse(y.ToString() + x.ToString())), (byte)color));
         }
 
         public override void UnregisterEffect(ILaunchpadEffect effect)
