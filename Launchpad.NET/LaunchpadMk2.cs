@@ -45,17 +45,17 @@ namespace Launchpad.NET
             for (var y = 1; y <= 8; y++)
             for (var x = 1; x <= 9; x++)
             {
-                    gridButtons.Add(new LaunchpadButton(0, (byte)(int.Parse(y.ToString() + x.ToString())), (byte)LaunchpadMK2Color.Off, outPort));
+                    gridButtons.Add(new LaunchpadButton(0, (byte)(int.Parse(x.ToString() + y.ToString())), (byte)LaunchpadMK2Color.Off, outPort));
             }
 
             // Create all the top buttons            
             for (var x = 104; x < 111; x++)
                 topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
 
-            for (var y = 0; y < 8; y++)
-                for (var x = 0; x < 8; x++)
+            for (var y = 1; y <= 8; y++)
+                for (var x = 1; x <= 9; x++)
                 {
-                    SetButtonColor(x, y, LaunchpadColor.Off);
+                    SetButtonColor(x, y, (byte)LaunchpadMK2Color.Maroon);
                 }
 
             // Process messages from device
@@ -101,9 +101,9 @@ namespace Launchpad.NET
             outPort.SendMessage(message);
         }
 
-        public override void SetButtonColor(int x, int y, LaunchpadColor color)
+        public override void SetButtonColor(int x, int y, byte color)
         {
-            
+            SendMessage(new MidiNoteOnMessage(0, (byte)(int.Parse(y.ToString() + xs.ToString())), (byte)color));
         }
 
         public override void UnregisterEffect(ILaunchpadEffect effect)

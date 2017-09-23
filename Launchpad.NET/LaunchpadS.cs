@@ -89,7 +89,7 @@ namespace Launchpad.NET
             for (var y = 0; y < 8; y++)
                 for (var x = 0; x < 8; x++)
                 {
-                    SetButtonColor(x, y, LaunchpadColor.Off);
+                    SetButtonColor(x, y, (byte)LaunchpadColor.Off);
                 }
         }
 
@@ -144,7 +144,7 @@ namespace Launchpad.NET
         /// <param name="x">X coordinate, should be 0-7.</param>
         /// <param name="y">Y coordinate, should be 0-7.</param>
         /// <param name="color">The color to set the button to.</param>
-        public override void SetButtonColor(int x, int y, LaunchpadColor color)
+        public override void SetButtonColor(int x, int y, byte color)
         {
             SendMessage(new MidiNoteOnMessage(0, (byte)(16 * y + x), (byte)color));
         }

@@ -66,7 +66,7 @@ namespace Launchpad.NET
             }
         }
         public abstract void SendMessage(IMidiMessage message);
-        public abstract void SetButtonColor(int x, int y, LaunchpadColor color);
+        public abstract void SetButtonColor(int x, int y, byte color);
         public abstract void UnregisterEffect(ILaunchpadEffect effect);
     }
 
