@@ -16,8 +16,8 @@ namespace Launchpad.NET.Effects
         List<LaunchpadButton> gridButtons;
         List<LaunchpadButton> sideButtons;
         List<LaunchpadTopButton> topButtons;
-        List<LaunchpadColor> horizontalColorKey;
-        LaunchpadColor[] verticalColorkey;
+        List<LaunchpadMK2Color> horizontalColorKey;
+        LaunchpadMK2Color[] verticalColorkey;
         readonly Subject<ILaunchpadEffect> whenComplete = new Subject<ILaunchpadEffect>();
         CompositeDisposable subscriptions;
 
@@ -39,16 +39,16 @@ namespace Launchpad.NET.Effects
             this.sideButtons = sideButtons;
             this.topButtons = topButtons;
 
-            horizontalColorKey = new List<LaunchpadColor>()
+            horizontalColorKey = new List<LaunchpadMK2Color>()
             {
-                LaunchpadColor.AmberFull,
-                LaunchpadColor.GreenFull,
-                LaunchpadColor.RedFull,
-                LaunchpadColor.Yellow,
-                LaunchpadColor.RedFull,
-                LaunchpadColor.AmberFull,
-                LaunchpadColor.GreenFull,
-                LaunchpadColor.RedFull
+                LaunchpadMK2Color.Red,
+                LaunchpadMK2Color.Brown,
+                LaunchpadMK2Color.Orange,
+                LaunchpadMK2Color.Yellow,
+                LaunchpadMK2Color.Peach,
+                LaunchpadMK2Color.Pink,
+                LaunchpadMK2Color.Maroon,
+                LaunchpadMK2Color.White
             };
 
             subscriptions.Add(
@@ -68,44 +68,44 @@ namespace Launchpad.NET.Effects
             {
                 case LaunchpadButton gridButton:
                     // Clear above
-                    var clearIndex = button.Id - 16;
-                    while (clearIndex >= 0)
+                    var clearIndex = button.Id + 10;
+                    while (clearIndex <= 88)
                     {
-                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = (byte)LaunchpadColor.Off;
-                        clearIndex -= 16;
+                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = (byte)LaunchpadMK2Color.Off;
+                        clearIndex += 10;
                     }
 
                     // Light at pressed button and below
                     var lightIndex = button.Id;
-                    while (lightIndex < 127)
+                    while (lightIndex >= 11)
                     {
-                        gridButtons.FirstOrDefault(b => b.Id == lightIndex).Color = (byte)horizontalColorKey[button.Id % 16];
-                        lightIndex += 16;
+                        gridButtons.FirstOrDefault(b => b.Id == lightIndex).Color = (byte)horizontalColorKey[button.Id % 10-1];
+                        lightIndex -= 10;
                     }
                     break;
-                case LaunchpadTopButton topButton:
-                    LaunchpadColor nextColor = LaunchpadColor.Off;
-                    switch (horizontalColorKey[button.Id % 104])
-                    {
-                        case LaunchpadColor.Off:
-                            nextColor = LaunchpadColor.AmberFull;
-                            break;
-                        case LaunchpadColor.AmberFull:
-                            nextColor = LaunchpadColor.GreenFull;
-                            break;
-                        case LaunchpadColor.GreenFull:
-                            nextColor = LaunchpadColor.RedFull;
-                            break;
-                        case LaunchpadColor.RedFull:
-                            nextColor = LaunchpadColor.Yellow;
-                            break;
-                        case LaunchpadColor.Yellow:
-                            nextColor = LaunchpadColor.AmberFull;
-                            break;
-                    }
-                    horizontalColorKey[button.Id % 104] = nextColor;
-                    UpdateColumnColor(button.Id % 104);
-                    break;
+                //case LaunchpadTopButton topButton:
+                //    LaunchpadColor nextColor = LaunchpadColor.Off;
+                //    switch (horizontalColorKey[button.Id % 104])
+                //    {
+                //        case LaunchpadColor.Off:
+                //            nextColor = LaunchpadColor.AmberFull;
+                //            break;
+                //        case LaunchpadColor.AmberFull:
+                //            nextColor = LaunchpadColor.GreenFull;
+                //            break;
+                //        case LaunchpadColor.GreenFull:
+                //            nextColor = LaunchpadColor.RedFull;
+                //            break;
+                //        case LaunchpadColor.RedFull:
+                //            nextColor = LaunchpadColor.Yellow;
+                //            break;
+                //        case LaunchpadColor.Yellow:
+                //            nextColor = LaunchpadColor.AmberFull;
+                //            break;
+                //    }
+                //    horizontalColorKey[button.Id % 104] = nextColor;
+                //    UpdateColumnColor(button.Id % 104);
+                //    break;
             }
             
         }

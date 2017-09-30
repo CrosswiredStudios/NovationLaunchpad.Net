@@ -85,14 +85,14 @@ namespace Launchpad.NET
                 foreach (var inputDeviceInfo in midiInputDevices)
                 {
                     Debug.WriteLine("INPUT: " + inputDeviceInfo.Name);
-                    if (inputDeviceInfo.Name.Equals(inputDeviceName))
+                    if (inputDeviceInfo.Name.ToLower().Contains(inputDeviceName.ToLower()))
                     {
                         // Find the launchpad output 
                         foreach (var outputDeviceInfo in midiOutputDevices)
                         {
                             Debug.WriteLine("OUTPUT: " + outputDeviceInfo.Name);
                             // If not a match continue
-                            if (!outputDeviceInfo.Name.Equals(outputDeviceName)) continue;
+                            if (!outputDeviceInfo.Name.ToLower().Contains(outputDeviceName.ToLower())) continue;
 
                             var inPort = await MidiInPort.FromIdAsync(inputDeviceInfo.Id);
                             var outPort = await MidiOutPort.FromIdAsync(outputDeviceInfo.Id);
