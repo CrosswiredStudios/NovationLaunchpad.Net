@@ -72,7 +72,7 @@ namespace Launchpad.NET
 
     public static class Novation
     {
-        public static async Task<Launchpad> Launchpad(string deviceName = "launchpad")
+        public static async Task<Launchpad> Launchpad(string inputDeviceName = "launchpad", string outputDeviceName = "launchpad")
         {
             try
             {
@@ -84,13 +84,15 @@ namespace Launchpad.NET
                 // Find the launchpad input
                 foreach (var inputDeviceInfo in midiInputDevices)
                 {
-                    if (inputDeviceInfo.Name.ToLower().Contains(deviceName.ToLower()))
+                    Debug.WriteLine("INPUT: " + inputDeviceInfo.Name);
+                    if (inputDeviceInfo.Name.Equals(inputDeviceName))
                     {
                         // Find the launchpad output 
                         foreach (var outputDeviceInfo in midiOutputDevices)
                         {
+                            Debug.WriteLine("OUTPUT: " + outputDeviceInfo.Name);
                             // If not a match continue
-                            if (!outputDeviceInfo.Name.ToLower().Contains(deviceName.ToLower())) continue;
+                            if (!outputDeviceInfo.Name.Equals(outputDeviceName)) continue;
 
                             var inPort = await MidiInPort.FromIdAsync(inputDeviceInfo.Id);
                             var outPort = await MidiOutPort.FromIdAsync(outputDeviceInfo.Id);

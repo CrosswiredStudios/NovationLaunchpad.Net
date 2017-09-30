@@ -91,7 +91,15 @@ namespace Launchpad.NET
                     whenButtonStateChanged.OnNext(gridButton);
                     break;
                 case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
+                    Debug.WriteLine($"Top Button Ch:{changeMessage.Channel}, ID:{changeMessage.Controller}");
 
+                    // Get a reference to the button
+                    var topButton = topButtons.FirstOrDefault(button => button.Id == changeMessage.Controller);
+
+                    // If the top button could not be found (should never happen), return
+                    if (topButton == null) return;
+
+                    whenButtonStateChanged.OnNext(topButton);
                     break;
             }
         }
