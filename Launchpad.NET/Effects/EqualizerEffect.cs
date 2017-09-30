@@ -41,14 +41,14 @@ namespace Launchpad.NET.Effects
 
             horizontalColorKey = new List<LaunchpadMK2Color>()
             {
-                LaunchpadMK2Color.Red,
-                LaunchpadMK2Color.Brown,
+                LaunchpadMK2Color.LightBlue,
+                LaunchpadMK2Color.LightPurple,
                 LaunchpadMK2Color.Orange,
-                LaunchpadMK2Color.Yellow,
-                LaunchpadMK2Color.Peach,
+                LaunchpadMK2Color.Green,
                 LaunchpadMK2Color.Pink,
-                LaunchpadMK2Color.Maroon,
-                LaunchpadMK2Color.White
+                LaunchpadMK2Color.DarkRed,
+                LaunchpadMK2Color.Orange,
+                LaunchpadMK2Color.Yellow
             };
 
             subscriptions.Add(

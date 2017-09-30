@@ -30,7 +30,7 @@ namespace AlienArtifactA.Models
             this.gridButtons = gridButtons;
             velocity = new Point(1, 1);
             currentButton = gridButtons.First(b => b.Id == ToId(ball));
-            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.Maroon;
+            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.DarkRed;
 
             whenButtonStateChanged
                 .Subscribe(ProcessInput);
@@ -65,7 +65,7 @@ namespace AlienArtifactA.Models
 
         public void Update()
         {
-            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.Maroon;
+            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.DarkRed;
 
             ball.X += velocity.X;
             ball.Y += velocity.Y;
