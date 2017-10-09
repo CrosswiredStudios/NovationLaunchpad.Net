@@ -1,4 +1,5 @@
-﻿using Windows.Devices.Midi;
+﻿using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Midi;
 
 namespace Launchpad.NET.Models
 {
@@ -50,6 +51,21 @@ namespace Launchpad.NET.Models
             Channel = channel;
             Id = id;            
             State = LaunchpadButtonState.Released;
+        }
+
+        public void StartPulse(LaunchpadMk2Color color)
+        {
+            outPort?.SendMessage(new MidiNoteOnMessage(2, Id, (byte)color));
+        }
+        public void StopPulse()
+        {
+            outPort?.SendMessage(new MidiNoteOnMessage(1, Id, 0));
+        }
+
+        public void SetColor(byte r, byte g, byte b)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 10, Id, r, g, b, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
         }
 
         public LaunchpadButtonState State { get; set; }

@@ -34,7 +34,7 @@ namespace Launchpad.NET
     /// <summary>
     /// Novation Launchpad .NET Interface
     /// </summary>
-    public class LaunchpadS : Launchpad
+    public class LaunchpadS : Launchpad, ILaunchpad
     {
               
         
@@ -144,7 +144,7 @@ namespace Launchpad.NET
         /// <param name="x">X coordinate, should be 0-7.</param>
         /// <param name="y">Y coordinate, should be 0-7.</param>
         /// <param name="color">The color to set the button to.</param>
-        public override void SetButtonColor(int x, int y, byte color)
+        public void SetButtonColor(int x, int y, byte color)
         {
             SendMessage(new MidiNoteOnMessage(0, (byte)(16 * y + x), (byte)color));
         }

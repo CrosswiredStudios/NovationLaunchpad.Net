@@ -7,11 +7,14 @@ using Windows.Devices.Enumeration;
 using Windows.Devices.Midi;
 using Launchpad.NET.Effects;
 using Launchpad.NET.Models;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 
 namespace Launchpad.NET
 {
+    public interface ILaunchpad { }
+
     public abstract class Launchpad
     {
         protected Dictionary<ILaunchpadEffect, IDisposable> effectsDisposables;
@@ -66,7 +69,7 @@ namespace Launchpad.NET
             }
         }
         public abstract void SendMessage(IMidiMessage message);
-        public abstract void SetButtonColor(int x, int y, byte color);
+
         public abstract void UnregisterEffect(ILaunchpadEffect effect);
     }
 
@@ -78,8 +81,10 @@ namespace Launchpad.NET
             {
                 // Get all input MIDI devices
                 var midiInputDevices = await DeviceInformation.FindAllAsync(MidiInPort.GetDeviceSelector());
+                midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found input device: {device.Name}"));
                 // Get all output MIDI devices
                 var midiOutputDevices = await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector());
+                midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name}"));
 
                 // Find the launchpad input
                 foreach (var inputDeviceInfo in midiInputDevices)

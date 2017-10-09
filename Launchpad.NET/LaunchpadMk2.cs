@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Midi;
 using Launchpad.NET.Effects;
 using Launchpad.NET.Models;
+using Windows.UI;
 
 // https://global.novationmusic.com/sites/default/files/novation/downloads/10529/launchpad-mk2-programmers-reference-guide_0.pdf
 
 namespace Launchpad.NET
 {
-    public enum LaunchpadMK2Color : byte
+    public enum LaunchpadMk2Color : byte
     {
         Off = 0,
         Black = 1,
@@ -29,7 +28,7 @@ namespace Launchpad.NET
         DarkBrown = 11,
         Offwhite = 12,
         Yellow = 13,
-        ArmyGreen = 14,
+        DarkYellow = 14,
         DarkArmyGreen = 15,
         Teal = 16,
         ElectricGreen = 17,
@@ -52,8 +51,12 @@ namespace Launchpad.NET
         Green = 63
     }
 
-    public class LaunchpadMk2 : Launchpad
+    public class LaunchpadMk2 : Launchpad, ILaunchpad
     {
+        public LaunchpadButton[,] Grid { get; }
+
+        public Color[,] GridBuffer { get; }
+
         public LaunchpadMk2(string name, MidiInPort inPort, IMidiOutPort outPort)
         {
             Name = name;
@@ -62,26 +65,60 @@ namespace Launchpad.NET
             Effects = new ObservableCollection<ILaunchpadEffect>();
             gridButtons = new List<LaunchpadButton>();
             topButtons = new List<LaunchpadTopButton>();
+            Grid = new LaunchpadButton[8, 8];
+            GridBuffer = new Color[8, 8];
 
             // Create all the grid buttons            
-            for (var y = 1; y <= 8; y++)
-            for (var x = 1; x <= 9; x++)
+            for (var y = 10; y <= 80; y=y+10)
+            for (var x = 1; x <= 8; x++)
             {
-                    gridButtons.Add(new LaunchpadButton(0, (byte)(int.Parse(x.ToString() + y.ToString())), (byte)LaunchpadMK2Color.Off, outPort));
+                    var button = new LaunchpadButton(0, (byte)(y+x), (byte)LaunchpadMk2Color.Off, outPort);
+                    //gridButtons.Add(button);
+
+                    Grid[x-1,y/10-1] = button;
+                    GridBuffer[x - 1, y / 10 - 1] = Colors.Black;
+                    button.Color = (byte)LaunchpadMk2Color.Off;
             }
 
-            // Create all the top buttons            
-            for (var x = 104; x < 111; x++)
-                topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
+            //// Create all the top buttons            
+            //for (var x = 104; x < 111; x++)
+            //    topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
 
-            for (var y = 1; y <= 8; y++)
-                for (var x = 1; x <= 9; x++)
-                {
-                    SetButtonColor(x, y, (byte)LaunchpadMK2Color.Off);
-                }
+            ClearAll();
 
             // Process messages from device
             inPort.MessageReceived += InPort_MessageReceived;
+        }
+
+        public void ClearAll()
+        {
+            SetAllButtonsColor(LaunchpadMk2Color.Off);
+        }
+
+        public void ClearGrid()
+        {
+            // Create all the grid buttons            
+            for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                {
+                    Grid[x,y].Color = (byte)LaunchpadMk2Color.Off;
+                }
+
+        }
+
+        public void FlushGridBuffer(bool clearBufferAfter = true)
+        {
+            var commandBytes = new List<byte>();
+            for(var y=0; y<8; y++)
+            {
+                for(var x=0; x<8; x++)
+                {
+                    var buttonId = (y+1) * 10 + (x+1);
+                    commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, GridBuffer[x, y].R, GridBuffer[x, y].G, GridBuffer[x, y].B, 247 });
+                }
+            }
+
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }
 
         /// <summary>
@@ -99,7 +136,7 @@ namespace Launchpad.NET
                     Debug.WriteLine($"Grid Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
 
                     // Get a reference to the button
-                    var gridButton = gridButtons.FirstOrDefault(button => button.Id == onMessage.Note);
+                    var gridButton = Grid[onMessage.Note % 10 - 1, onMessage.Note / 10 - 1];
 
                     // If the grid button could not be found (should never happen), return
                     if (gridButton == null) return;
@@ -131,9 +168,42 @@ namespace Launchpad.NET
             outPort.SendMessage(message);
         }
 
-        public override void SetButtonColor(int x, int y, byte color)
+        public void SetAllButtonsColor(LaunchpadMk2Color color)
         {
-            SendMessage(new MidiNoteOnMessage(0, (byte)(int.Parse(y.ToString() + x.ToString())), (byte)color));
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 14, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
+        public void SetButtonColor(int x, int y, Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x,y].Id, color.R, color.G, color.B, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+
+        }
+
+        public void SetButtonColor(int x, int y, LaunchpadMk2Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 10, Grid[x,y].Id, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
+        public void SetButtonColor(int x, int y, byte r, byte g, byte b)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x, y].Id, r, g, b, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+
+        }
+
+        public void SetColumnColor(int column, LaunchpadMk2Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
+        public void SetRowColor(int row, LaunchpadMk2Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 13, (byte)row, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
         }
 
         public override void UnregisterEffect(ILaunchpadEffect effect)

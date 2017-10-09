@@ -16,8 +16,8 @@ namespace Launchpad.NET.Effects
         List<LaunchpadButton> gridButtons;
         List<LaunchpadButton> sideButtons;
         List<LaunchpadTopButton> topButtons;
-        List<LaunchpadMK2Color> horizontalColorKey;
-        LaunchpadMK2Color[] verticalColorkey;
+        List<LaunchpadMk2Color> horizontalColorKey;
+        LaunchpadMk2Color[] verticalColorkey;
         readonly Subject<ILaunchpadEffect> whenComplete = new Subject<ILaunchpadEffect>();
         CompositeDisposable subscriptions;
 
@@ -39,16 +39,16 @@ namespace Launchpad.NET.Effects
             this.sideButtons = sideButtons;
             this.topButtons = topButtons;
 
-            horizontalColorKey = new List<LaunchpadMK2Color>()
+            horizontalColorKey = new List<LaunchpadMk2Color>()
             {
-                LaunchpadMK2Color.LightBlue,
-                LaunchpadMK2Color.LightPurple,
-                LaunchpadMK2Color.Orange,
-                LaunchpadMK2Color.Green,
-                LaunchpadMK2Color.Pink,
-                LaunchpadMK2Color.DarkRed,
-                LaunchpadMK2Color.Orange,
-                LaunchpadMK2Color.Yellow
+                LaunchpadMk2Color.LightBlue,
+                LaunchpadMk2Color.LightPurple,
+                LaunchpadMk2Color.Orange,
+                LaunchpadMk2Color.Green,
+                LaunchpadMk2Color.Pink,
+                LaunchpadMk2Color.DarkRed,
+                LaunchpadMk2Color.Orange,
+                LaunchpadMk2Color.Yellow
             };
 
             subscriptions.Add(
@@ -71,7 +71,7 @@ namespace Launchpad.NET.Effects
                     var clearIndex = button.Id + 10;
                     while (clearIndex <= 88)
                     {
-                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = (byte)LaunchpadMK2Color.Off;
+                        gridButtons.FirstOrDefault(b => b.Id == clearIndex).Color = (byte)LaunchpadMk2Color.Off;
                         clearIndex += 10;
                     }
 

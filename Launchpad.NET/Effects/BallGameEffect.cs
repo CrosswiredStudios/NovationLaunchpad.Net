@@ -30,7 +30,7 @@ namespace AlienArtifactA.Models
             this.gridButtons = gridButtons;
             velocity = new Point(1, 1);
             currentButton = gridButtons.First(b => b.Id == ToId(ball));
-            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.DarkRed;
+            currentButton.Color = (byte)Launchpad.NET.LaunchpadMk2Color.DarkRed;
 
             whenButtonStateChanged
                 .Subscribe(ProcessInput);
@@ -44,9 +44,9 @@ namespace AlienArtifactA.Models
                     if(gridButton.Id.ToString().Last() == '9')
                     {
                         if(gridButton.State == LaunchpadButtonState.Pressed)
-                            gridButtons.Where(b => b.Id.ToString().First() == gridButton.Id.ToString().First()).Select(rowButton => rowButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.Brown);
+                            gridButtons.Where(b => b.Id.ToString().First() == gridButton.Id.ToString().First()).Select(rowButton => rowButton.Color = (byte)Launchpad.NET.LaunchpadMk2Color.Brown);
                         else
-                            gridButtons.Where(b => b.Id.ToString().First() == gridButton.Id.ToString().First()).Select(rowButton => rowButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.Off);
+                            gridButtons.Where(b => b.Id.ToString().First() == gridButton.Id.ToString().First()).Select(rowButton => rowButton.Color = (byte)Launchpad.NET.LaunchpadMk2Color.Off);
                     }
                     break;
 
@@ -65,7 +65,7 @@ namespace AlienArtifactA.Models
 
         public void Update()
         {
-            currentButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.DarkRed;
+            currentButton.Color = (byte)Launchpad.NET.LaunchpadMk2Color.DarkRed;
 
             ball.X += velocity.X;
             ball.Y += velocity.Y;
@@ -76,7 +76,7 @@ namespace AlienArtifactA.Models
             if (ball.Y == 8) velocity.Y = -1;
              var nextButton = gridButtons.First(b => b.Id == ToId(ball));
 
-            nextButton.Color = (byte)Launchpad.NET.LaunchpadMK2Color.Off;
+            nextButton.Color = (byte)Launchpad.NET.LaunchpadMk2Color.Off;
             currentButton = nextButton;
         }
     }
