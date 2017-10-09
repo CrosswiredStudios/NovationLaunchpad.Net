@@ -176,7 +176,8 @@ namespace Launchpad.NET
 
         public void SetButtonColor(int x, int y, Color color)
         {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x,y].Id, color.R, color.G, color.B, 247 };
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x,y].Id, (byte)(color.R/4), (byte)(color.G / 4), (byte)(color.B / 4), 247,
+                                       240, 0, 32, 41, 2, 24, 11, (byte)(Grid[x,y].Id+1), (byte)(color.R/4), (byte)(color.G / 4), (byte)(color.B / 4), 247};
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
 
         }
