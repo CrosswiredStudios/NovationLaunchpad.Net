@@ -130,6 +130,7 @@ namespace Launchpad.NET
             {
                 for(var x=0; x<8; x++)
                 {
+                    //Test
                     var buttonId = (y+1) * 10 + (x+1);
                     commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)buttonId, (byte)(GridBuffer[x, y].R / 4), (byte)(GridBuffer[x, y].G / 4), (byte)(GridBuffer[x, y].B / 4), 247 });
                 }
