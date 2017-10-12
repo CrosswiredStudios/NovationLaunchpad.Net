@@ -48,6 +48,7 @@ namespace Launchpad.NET
         {
             try
             {
+
                 // Add the effect to the launchpad
                 Effects.Add(effect);
 
@@ -57,16 +58,26 @@ namespace Launchpad.NET
                         .WhenComplete? // If the effect has implemented whenComplete
                         .Subscribe(UnregisterEffect));
 
+                //if (effect.WhenChangeUpdateFrequency != null)
+                //{
+                //    // When the effect is complete, unregister it (add the subscription to a dictionary so we can make sure to release it later)
+                //    effectsDisposables.Add(effect,
+                //        effect
+                //            .WhenChangeUpdateFrequency? // If the effect has implemented whenComplete
+                //            .Subscribe((newFrequency) => ChangeUpdateFrequency(effect, newFrequency));
+                //}
+
                 // Initiate the effect (provide all buttons and button changed event
                 effect.Initiate(gridButtons, sideButtons, topButtons, whenButtonStateChanged);
 
                 // Create an update timer at the specified frequency
-                effectsTimers.Add(effect, new Timer(_ => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
+                effectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
             }
+
         }
         public abstract void SendMessage(IMidiMessage message);
 

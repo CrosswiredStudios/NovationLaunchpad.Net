@@ -131,7 +131,7 @@ namespace Launchpad.NET
                 for(var x=0; x<8; x++)
                 {
                     var buttonId = (y+1) * 10 + (x+1);
-                    commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, GridBuffer[x, y].R, GridBuffer[x, y].G, GridBuffer[x, y].B, 247 });
+                    commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)buttonId, (byte)(GridBuffer[x, y].R / 4), (byte)(GridBuffer[x, y].G / 4), (byte)(GridBuffer[x, y].B / 4), 247 });
                 }
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
