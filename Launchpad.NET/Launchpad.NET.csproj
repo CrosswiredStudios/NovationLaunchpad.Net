@@ -107,6 +107,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Effects\ILaunchpadEffect.cs" />
+    <Compile Include="Effects\PiskelEffect.cs" />
     <Compile Include="LaunchpadMk2.cs" />
     <Compile Include="Launchpad.cs" />
     <Compile Include="Models\LaunchpadButton.cs" />
@@ -118,6 +119,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>10.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
       <Version>4.0.0-preview00001</Version>
