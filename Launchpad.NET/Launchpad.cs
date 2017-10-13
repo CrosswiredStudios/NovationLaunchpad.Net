@@ -10,6 +10,8 @@ using Launchpad.NET.Models;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Reactive.Disposables;
+using System.Reactive;
 
 namespace Launchpad.NET
 {
@@ -17,7 +19,7 @@ namespace Launchpad.NET
 
     public abstract class Launchpad
     {
-        protected Dictionary<ILaunchpadEffect, IDisposable> effectsDisposables;
+        protected Dictionary<ILaunchpadEffect, CompositeDisposable> effectsDisposables;
         protected Dictionary<ILaunchpadEffect, Timer> effectsTimers;
         protected List<LaunchpadButton> gridButtons;
         protected MidiInPort inPort;
@@ -35,8 +37,18 @@ namespace Launchpad.NET
 
         public Launchpad()
         {
-            effectsDisposables = new Dictionary<ILaunchpadEffect, IDisposable>();
+            effectsDisposables = new Dictionary<ILaunchpadEffect, CompositeDisposable>();
             effectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
+        }
+
+        void OnChangeEffectUpdateFrequency(ILaunchpadEffect effect, int newFrequency)
+        {
+            effectsTimers[effect].Change(0, newFrequency);
+        }
+
+        void OnEffectComplete(ILaunchpadEffect effect)
+        {
+            UnregisterEffect(effect);
         }
 
         /// <summary>
@@ -48,30 +60,44 @@ namespace Launchpad.NET
         {
             try
             {
-
                 // Add the effect to the launchpad
                 Effects.Add(effect);
 
-                // When the effect is complete, unregister it (add the subscription to a dictionary so we can make sure to release it later)
-                effectsDisposables.Add(effect,
-                    effect
-                        .WhenComplete? // If the effect has implemented whenComplete
-                        .Subscribe(UnregisterEffect));
+                // Register any observables being used
+                CompositeDisposable effectDisposables = new CompositeDisposable();
 
-                //if (effect.WhenChangeUpdateFrequency != null)
-                //{
-                //    // When the effect is complete, unregister it (add the subscription to a dictionary so we can make sure to release it later)
-                //    effectsDisposables.Add(effect,
-                //        effect
-                //            .WhenChangeUpdateFrequency? // If the effect has implemented whenComplete
-                //            .Subscribe((newFrequency) => ChangeUpdateFrequency(effect, newFrequency));
-                //}
+                // If this effect needs the ability to change its frequency
+                if(effect.WhenChangeUpdateFrequency != null)
+                {
+                    // Subscribe to the event to change the frequency and add it to this effects disposables
+                    effectDisposables.Add(
+                        effect
+                        .WhenChangeUpdateFrequency
+                        .Subscribe(newFrequency=>
+                        {
+                            // Change the frequency for this effect
+                            OnChangeEffectUpdateFrequency(effect, newFrequency);
+                        }));
+                }
 
-                // Initiate the effect (provide all buttons and button changed event
-                effect.Initiate(gridButtons, sideButtons, topButtons, whenButtonStateChanged);
+                // If this effect will notify us it needs to be unregistered
+                if(effect.WhenComplete != null)
+                {
+                    effectDisposables.Add(
+                        effect
+                        .WhenComplete
+                        .Subscribe(_ => 
+                        {
+                            // Unregister the effect and destroy its disposables
+                            OnEffectComplete(effect);
+                        }));
+                }
 
                 // Create an update timer at the specified frequency
                 effectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
+
+                // Initiate the effect (provide all buttons and button changed event
+                effect.Initiate(this);
             }
             catch (Exception ex)
             {
@@ -117,8 +143,9 @@ namespace Launchpad.NET
                             if (outputDeviceInfo.Name.ToLower().Contains("mk2"))
                                 return new LaunchpadMk2(outputDeviceInfo.Name, inPort, outPort);
 
+                            return null;
                             // Otherwise return Standard
-                            return new LaunchpadS(outputDeviceInfo.Name, inPort, outPort);
+                            //return new LaunchpadS(outputDeviceInfo.Name, inPort, outPort);
                         }
                     }
                 }

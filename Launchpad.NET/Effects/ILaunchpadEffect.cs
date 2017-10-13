@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Launchpad.NET.Models;
+using System.Reactive;
 
 namespace Launchpad.NET.Effects
 {
@@ -16,10 +17,10 @@ namespace Launchpad.NET.Effects
     public interface ILaunchpadEffect
     {
         string Name { get; }
-        IObservable<ILaunchpadEffect> WhenComplete { get; }
-        void Initiate(List<LaunchpadButton> gridButtons, List<LaunchpadButton> sideButtons, List<LaunchpadTopButton> topButtons, IObservable<ILaunchpadButton> whenButtonStateChanged);
+        IObservable<int> WhenChangeUpdateFrequency { get; }
+        IObservable<Unit> WhenComplete { get; }
+        void Initiate(Launchpad launchpad);
         void Terminate();
         void Update();
-        
     }
 }
