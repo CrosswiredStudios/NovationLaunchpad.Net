@@ -241,7 +241,7 @@ namespace Launchpad.NET
 
         public override void UnregisterEffect(ILaunchpadEffect effect)
         {
-            
+            effectsDisposables[effect].Dispose();
         }
     }
 }

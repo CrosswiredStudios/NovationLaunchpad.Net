@@ -15,7 +15,10 @@ using System.Reactive;
 
 namespace Launchpad.NET
 {
-    public interface ILaunchpad { }
+    public interface ILaunchpad
+    {
+        
+    }
 
     public abstract class Launchpad
     {
@@ -49,6 +52,11 @@ namespace Launchpad.NET
         void OnEffectComplete(ILaunchpadEffect effect)
         {
             UnregisterEffect(effect);
+        }
+
+        public void RegisterEffect(ILaunchpadEffect effect, int updateFrequency)
+        {
+            RegisterEffect(effect, TimeSpan.FromMilliseconds(updateFrequency));
         }
 
         /// <summary>
@@ -92,6 +100,8 @@ namespace Launchpad.NET
                             OnEffectComplete(effect);
                         }));
                 }
+
+                effectsDisposables.Add(effect, effectDisposables);
 
                 // Create an update timer at the specified frequency
                 effectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));

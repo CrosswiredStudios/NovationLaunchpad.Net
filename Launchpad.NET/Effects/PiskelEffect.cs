@@ -6,15 +6,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Subjects;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
-using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Core;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -101,57 +99,27 @@ namespace Launchpad.NET.Effects
     {
         int currentFrameIndex;
         SKBitmap bitmap;
+        string filePath;
+        List<Color[,]> frames;
+        bool isFinished;
         bool isInitiated;
         LaunchpadMk2 launchpad;
-        List<Color[,]> frames;
+        bool loop;
         PiskelFile piskelFile;
+        readonly Subject<Unit> whenComplete = new Subject<Unit>();
+
         public string Name => "Piskel";
 
         public IObservable<int> WhenChangeUpdateFrequency => null;
 
         public IObservable<Unit> WhenComplete => null;
 
-        public PiskelEffect(string filePath)
+        public PiskelEffect(string filePath, bool loop)
         {
             frames = new List<Color[,]>();
-            try
-            {
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(filePath);
-                    var fileStream = File.OpenText(filePath);
-                    var contents = fileStream.ReadToEnd();
-                    piskelFile = new PiskelFile(contents);
-                    var pngData = piskelFile.Layers.First().Chunks.First().Data;
-                    bitmap = SKBitmap.Decode(pngData);
-
-                    var totalFrames = piskelFile.Layers.First().FrameCount;
-                    var frameWidth = bitmap.Width / totalFrames;
-
-                    for (var frameIndex = 0; frameIndex < totalFrames; frameIndex++)
-                    {
-                        var frame = new Color[frameWidth, bitmap.Height];
-                        var xOffset = frameIndex * frameWidth;
-                        for (var y = 0; y < bitmap.Height; y++)
-                        {
-                            for (var x = 0; x < frameWidth; x++)
-                            {
-                                var pixel = bitmap.Pixels[frameWidth * y + (x + xOffset)];
-                                frame[x, y] = Color.FromArgb(pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue);
-                            }
-                        }
-                        frames.Add(frame);
-                    }
-
-
-                    isInitiated = true;
-                });
-
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
+            isFinished = false;
+            this.filePath = filePath;
+            this.loop = loop;
         }
 
         void DrawFrame(Color[,] frame)
@@ -190,6 +158,44 @@ namespace Launchpad.NET.Effects
         public void Initiate(Launchpad launchpad)
         {
             this.launchpad = launchpad as LaunchpadMk2;
+            try
+            {
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(filePath);
+                    var fileStream = File.OpenText(filePath);
+                    var contents = fileStream.ReadToEnd();
+                    piskelFile = new PiskelFile(contents);
+                    var pngData = piskelFile.Layers.First().Chunks.First().Data;
+                    bitmap = SKBitmap.Decode(pngData);
+
+                    var totalFrames = piskelFile.Layers.First().FrameCount;
+                    var frameWidth = bitmap.Width / totalFrames;
+
+                    for (var frameIndex = 0; frameIndex < totalFrames; frameIndex++)
+                    {
+                        var frame = new Color[frameWidth, bitmap.Height];
+                        var xOffset = frameIndex * frameWidth;
+                        for (var y = 0; y < bitmap.Height; y++)
+                        {
+                            for (var x = 0; x < frameWidth; x++)
+                            {
+                                var pixel = bitmap.Pixels[bitmap.Width * y + (x + xOffset)];
+                                frame[x, y] = Color.FromArgb(pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue);
+                            }
+                        }
+                        frames.Add(frame);
+                    }
+
+
+                    isInitiated = true;
+                });
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         public void Terminate()
@@ -199,9 +205,18 @@ namespace Launchpad.NET.Effects
 
         public void Update()
         {
-            if (!isInitiated) return;
+            if (!isInitiated || isFinished) return;
             currentFrameIndex++;
-            if (currentFrameIndex >= piskelFile.Layers.First().FrameCount) currentFrameIndex = 0;
+            if (currentFrameIndex >= piskelFile.Layers.First().FrameCount)
+            {
+                if (loop)
+                    currentFrameIndex = 0;
+                else
+                {
+                    isFinished = true;
+                    whenComplete.OnNext(new Unit());
+                }
+            }
 
             DrawFrame(frames[currentFrameIndex]);
         }
