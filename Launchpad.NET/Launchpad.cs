@@ -122,21 +122,75 @@ namespace Launchpad.NET
 
     public static class Novation
     {
-        public static async Task<Launchpad> Launchpad(string id)
+        public static async Task<IEnumerable<Launchpad>> GetAllLaunchpads()
         {
+            List<Launchpad> launchpads = new List<Launchpad>();
             // Get all input MIDI devices
             var midiInputDevices = await DeviceInformation.FindAllAsync(MidiInPort.GetDeviceSelector());
-            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found input device: {device.Name}"));
+            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found input device: {device.Name} ({device.Id})"));
             // Get all output MIDI devices
             var midiOutputDevices = await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector());
-            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name}"));
+            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name} ({device.Id})"));
+
+            foreach(var device in midiInputDevices)
+            {
+                if(device.Name.Contains("Launchpad"))
+                {
+                    launchpads.Add(
+                        new LaunchpadMk2(device.Name, 
+                                    await MidiInPort.FromIdAsync(device.Id), 
+                                    await MidiOutPort.FromIdAsync(device.Id)));
+                }
+            }
+
+            return launchpads;
+        }
+
+        public static async Task<Launchpad> Launchpad(string id)
+        {
+            List<DeviceInformation> inputs = (await DeviceInformation.FindAllAsync(MidiInPort.GetDeviceSelector())).ToList();
+            List<DeviceInformation> outputs = (await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector())).ToList();
+
+            inputs.ForEach(i => Debug.WriteLine($"Found input device: {i.Name} ({i.Id})"));
+            outputs.ForEach(d => Debug.WriteLine($"Found output device: {d.Name} ({d.Id})"));
 
 
-            var inPort = await MidiInPort.FromIdAsync(id);
-            var outPort = await MidiOutPort.FromIdAsync(id);
+            // Find the launchpad input
+            foreach (var inputDeviceInfo in inputs)
+            {
+                try
+                {
+                    if (inputDeviceInfo.Id.Contains(id))
+                    {
+                        // Find the launchpad output 
+                        foreach (var outputDeviceInfo in outputs)
+                        {
 
-            
-            return new LaunchpadMk2(id, inPort, outPort);
+                            // If not a match continue
+                            if (!outputDeviceInfo.Id.Contains(id)) continue;
+
+                            var inPort = await MidiInPort.FromIdAsync(inputDeviceInfo.Id);
+                            var outPort = await MidiOutPort.FromIdAsync(outputDeviceInfo.Id);
+
+                            // Return an MK2 if detected
+                            if (outputDeviceInfo.Name.ToLower().Contains("mk2"))
+                                return new LaunchpadMk2(outputDeviceInfo.Name, inPort, outPort);
+
+                            return null;
+                            // Otherwise return Standard
+                            //return new LaunchpadS(outputDeviceInfo.Name, inPort, outPort);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+
+                    Debug.WriteLine(ex);
+                }
+            }
+
+            // Return null if no devices matched the device name provided
+            return null;
         }
 
         public static async Task<Launchpad> Launchpad(string inputDeviceName, string outputDeviceName)
@@ -148,7 +202,7 @@ namespace Launchpad.NET
                 midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found input device: {device.Name}"));
                 // Get all output MIDI devices
                 var midiOutputDevices = await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector());
-                midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name}"));
+                midiOutputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name}"));
 
                 // Find the launchpad input
                 foreach (var inputDeviceInfo in midiInputDevices)
