@@ -122,7 +122,24 @@ namespace Launchpad.NET
 
     public static class Novation
     {
-        public static async Task<Launchpad> Launchpad(string inputDeviceName = "launchpad", string outputDeviceName = "launchpad")
+        public static async Task<Launchpad> Launchpad(string id)
+        {
+            // Get all input MIDI devices
+            var midiInputDevices = await DeviceInformation.FindAllAsync(MidiInPort.GetDeviceSelector());
+            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found input device: {device.Name}"));
+            // Get all output MIDI devices
+            var midiOutputDevices = await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector());
+            midiInputDevices.ToList().ForEach(device => Debug.WriteLine($"Found output device: {device.Name}"));
+
+
+            var inPort = await MidiInPort.FromIdAsync(id);
+            var outPort = await MidiOutPort.FromIdAsync(id);
+
+            
+            return new LaunchpadMk2(id, inPort, outPort);
+        }
+
+        public static async Task<Launchpad> Launchpad(string inputDeviceName, string outputDeviceName)
         {
             try
             {

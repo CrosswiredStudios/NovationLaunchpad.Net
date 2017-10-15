@@ -191,6 +191,12 @@ namespace Launchpad.NET
             }
         }
 
+        public void PulseButton(int x, int y, LaunchpadMk2Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 40, Grid[x, y].Id, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
         public override void SendMessage(IMidiMessage message)
         {
             outPort.SendMessage(message);
