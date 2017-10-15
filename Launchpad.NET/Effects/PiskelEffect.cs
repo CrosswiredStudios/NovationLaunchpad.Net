@@ -95,7 +95,7 @@ namespace Launchpad.NET.Effects
         }
     }
 
-    public class PiskelEffect : ILaunchpadEffect
+    public class PiskelEffect : LaunchpadEffect
     {
         int currentFrameIndex;
         SKBitmap bitmap;
@@ -112,7 +112,7 @@ namespace Launchpad.NET.Effects
 
         public IObservable<int> WhenChangeUpdateFrequency => null;
 
-        public IObservable<Unit> WhenComplete => null;
+        public IObservable<ILaunchpadEffect> WhenComplete => null;
 
         public PiskelEffect(string filePath, bool loop)
         {

@@ -22,7 +22,7 @@ namespace Launchpad.NET
 
     public abstract class Launchpad
     {
-        protected Dictionary<ILaunchpadEffect, CompositeDisposable> effectsDisposables;
+        public Dictionary<ILaunchpadEffect, CompositeDisposable> EffectsDisposables { get; }
         protected Dictionary<ILaunchpadEffect, Timer> effectsTimers;
         protected List<LaunchpadButton> gridButtons;
         protected MidiInPort inPort;
@@ -40,7 +40,7 @@ namespace Launchpad.NET
 
         public Launchpad()
         {
-            effectsDisposables = new Dictionary<ILaunchpadEffect, CompositeDisposable>();
+            EffectsDisposables = new Dictionary<ILaunchpadEffect, CompositeDisposable>();
             effectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
         }
 
@@ -101,7 +101,7 @@ namespace Launchpad.NET
                         }));
                 }
 
-                effectsDisposables.Add(effect, effectDisposables);
+                EffectsDisposables.Add(effect, effectDisposables);
 
                 // Create an update timer at the specified frequency
                 effectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
