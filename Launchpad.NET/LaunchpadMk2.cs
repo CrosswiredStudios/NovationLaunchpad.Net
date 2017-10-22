@@ -55,7 +55,7 @@ namespace Launchpad.NET
     {
         public LaunchpadButton[,] Grid { get; }
 
-        public Color[,] GridBuffer { get; }
+        public Color[,] GridBuffer { get; private set; }
 
         public List<LaunchpadButton> SideButtons => sideButtons;
 
@@ -77,7 +77,8 @@ namespace Launchpad.NET
             {
                     var button = new LaunchpadButton(0, (byte)(y+x), (byte)LaunchpadMk2Color.Off, outPort);
                     //gridButtons.Add(button);
-
+                    button.X = x - 1;
+                    button.Y = y / 10 - 1;
                     Grid[x-1,y/10-1] = button;
                     GridBuffer[x - 1, y / 10 - 1] = Colors.Black;
                     button.Color = (byte)LaunchpadMk2Color.Off;
@@ -88,8 +89,8 @@ namespace Launchpad.NET
                 sideButtons.Add(new LaunchpadButton(0, (byte)(10*x+9), (byte)LaunchpadMk2Color.Off, outPort));
             }
 
-            //// Create all the top buttons            
-            //for (var x = 104; x < 111; x++)
+            // Create all the top buttons            
+            //for (var x = 1; x < 9; x++)
             //    topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
 
             ClearAll();
@@ -111,7 +112,6 @@ namespace Launchpad.NET
                 {
                     Grid[x,y].Color = (byte)LaunchpadMk2Color.Off;
                 }
-
         }
 
         public void ClearGridRow(int row)
@@ -138,6 +138,9 @@ namespace Launchpad.NET
                 }
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+
+            if (clearBufferAfter)
+                GridBuffer = new Color[8,8];
         }
 
         /// <summary>
@@ -245,6 +248,16 @@ namespace Launchpad.NET
             {
                 var buttonId = row * 10 + x;
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, (byte)color, 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+        }
+
+        public void SetTopRowColor(Color color)
+        {
+            var commandBytes = new List<byte>();
+            for (var buttonId = 104; buttonId < 112; buttonId++)
+            {
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)buttonId, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }

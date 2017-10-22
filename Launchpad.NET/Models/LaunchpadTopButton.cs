@@ -26,7 +26,8 @@ namespace Launchpad.NET.Models
 
         public byte Id { get; set; }
         public LaunchpadButtonState State { get; set; }
-
+        public int X { get; set; }
+        public int Y { get; set; }
         public LaunchpadTopButton(byte id, byte color)
         {
             Id = id;

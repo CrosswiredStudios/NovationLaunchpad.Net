@@ -30,6 +30,7 @@ namespace Launchpad.NET
         protected List<LaunchpadButton> sideButtons;
         protected List<LaunchpadTopButton> topButtons;
         protected readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();
+        protected readonly Subject<Unit> whenReset = new Subject<Unit>();
 
         public ObservableCollection<ILaunchpadEffect> Effects { get; protected set; }
         public string Name { get; set; }
@@ -144,6 +145,14 @@ namespace Launchpad.NET
             }
 
             return launchpads;
+        }
+
+        public static async Task<IEnumerable<DeviceInformation>> GetLaunchpadDeviceInformation()
+        {
+            // Get all output MIDI devices
+            var outputs = await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector());
+
+            return outputs.Where(device => device.Name.ToLower().Contains("launchpad"));
         }
 
         public static async Task<Launchpad> Launchpad(string id)
