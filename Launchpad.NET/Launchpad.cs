@@ -22,8 +22,7 @@ namespace Launchpad.NET
 
     public abstract class Launchpad
     {
-        public Dictionary<ILaunchpadEffect, CompositeDisposable> EffectsDisposables { get; }
-        protected Dictionary<ILaunchpadEffect, Timer> effectsTimers;
+        
         protected List<LaunchpadButton> gridButtons;
         protected MidiInPort inPort;
         protected IMidiOutPort outPort;
@@ -32,7 +31,8 @@ namespace Launchpad.NET
         protected readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();
         protected readonly Subject<Unit> whenReset = new Subject<Unit>();
 
-        public ObservableCollection<ILaunchpadEffect> Effects { get; protected set; }
+        public Dictionary<ILaunchpadEffect, CompositeDisposable> EffectsDisposables { get; }
+        public Dictionary<ILaunchpadEffect, Timer> EffectsTimers { get; }
         public string Name { get; set; }
         /// <summary>
         /// Observable event for when a button on the launchpad is pressed or released
@@ -42,17 +42,12 @@ namespace Launchpad.NET
         public Launchpad()
         {
             EffectsDisposables = new Dictionary<ILaunchpadEffect, CompositeDisposable>();
-            effectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
+            EffectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
         }
 
         void OnChangeEffectUpdateFrequency(ILaunchpadEffect effect, int newFrequency)
         {
-            effectsTimers[effect].Change(0, newFrequency);
-        }
-
-        void OnEffectComplete(ILaunchpadEffect effect)
-        {
-            UnregisterEffect(effect);
+            EffectsTimers[effect].Change(0, newFrequency);
         }
 
         public void RegisterEffect(ILaunchpadEffect effect, int updateFrequency)
@@ -69,8 +64,6 @@ namespace Launchpad.NET
         {
             try
             {
-                // Add the effect to the launchpad
-                Effects.Add(effect);
 
                 // Register any observables being used
                 CompositeDisposable effectDisposables = new CompositeDisposable();
@@ -98,14 +91,14 @@ namespace Launchpad.NET
                         .Subscribe(_ => 
                         {
                             // Unregister the effect and destroy its disposables
-                            OnEffectComplete(effect);
+                            UnregisterEffect(effect);
                         }));
                 }
 
                 EffectsDisposables.Add(effect, effectDisposables);
 
                 // Create an update timer at the specified frequency
-                effectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
+                EffectsTimers.Add(effect, new Timer(state => effect.Update(), null, 0, (int)updateFrequency.TotalMilliseconds));
 
                 // Initiate the effect (provide all buttons and button changed event
                 effect.Initiate(this);

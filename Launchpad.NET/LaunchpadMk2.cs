@@ -64,7 +64,6 @@ namespace Launchpad.NET
             Name = name;
             this.inPort = inPort;
             this.outPort = outPort;            
-            Effects = new ObservableCollection<ILaunchpadEffect>();
             gridButtons = new List<LaunchpadButton>();
             sideButtons = new List<LaunchpadButton>();
             topButtons = new List<LaunchpadTopButton>();
@@ -265,6 +264,9 @@ namespace Launchpad.NET
         public override void UnregisterEffect(ILaunchpadEffect effect)
         {
             EffectsDisposables[effect].Dispose();
+            EffectsDisposables.Remove(effect);
+            EffectsTimers[effect].Dispose();
+            EffectsTimers.Remove(effect);
             effect.Dispose();
         }
     }

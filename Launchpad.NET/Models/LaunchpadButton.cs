@@ -63,6 +63,7 @@ namespace Launchpad.NET.Models
         {
             outPort?.SendMessage(new MidiNoteOnMessage(2, Id, (byte)color));
         }
+
         public void StopPulse()
         {
             outPort?.SendMessage(new MidiNoteOnMessage(1, Id, 0));
