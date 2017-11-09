@@ -31,7 +31,7 @@ namespace Launchpad.NET.Models
             get => color;
             set
             {
-                outPort?.SendMessage(new MidiNoteOnMessage(Channel, Id, (byte)Color));
+                //outPort?.SendMessage(new MidiNoteOnMessage(Channel, Id, (byte)Color));
                 color = value;
             }
         }

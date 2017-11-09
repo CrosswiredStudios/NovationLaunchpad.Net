@@ -153,8 +153,8 @@ namespace Launchpad.NET
             List<DeviceInformation> inputs = (await DeviceInformation.FindAllAsync(MidiInPort.GetDeviceSelector())).ToList();
             List<DeviceInformation> outputs = (await DeviceInformation.FindAllAsync(MidiOutPort.GetDeviceSelector())).ToList();
 
-            inputs.ForEach(i => Debug.WriteLine($"Found input device: {i.Name} ({i.Id})"));
-            outputs.ForEach(d => Debug.WriteLine($"Found output device: {d.Name} ({d.Id})"));
+            //inputs.ForEach(i => Debug.WriteLine($"Found input device: {i.Name} ({i.Id})"));
+            //outputs.ForEach(d => Debug.WriteLine($"Found output device: {d.Name} ({d.Id})"));
 
 
             // Find the launchpad input

@@ -124,7 +124,7 @@
       <Version>10.0.3</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp">
-      <Version>1.59.1</Version>
+      <Version>1.59.2</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
       <Version>4.0.0-preview00001</Version>
