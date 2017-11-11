@@ -90,8 +90,8 @@ namespace Launchpad.NET
             }
 
             //Create all the top buttons
-            //for (var x = 1; x < 9; x++)
-            //    topButtons.Add(new LaunchpadTopButton((byte)x, (byte)LaunchpadColor.Off, outPort));
+            for (var x = 0; x < 8; x++)
+                topButtons.Add(new LaunchpadTopButton((byte)(x + 104), (byte)LaunchpadMk2Color.Off, outPort));
 
             //ClearAll();
 
@@ -190,14 +190,16 @@ namespace Launchpad.NET
                     }
                     break;
                 case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
-                    Debug.WriteLine($"Top Button Ch:{changeMessage.Channel}, ID:{changeMessage.Controller}");
+                    Debug.WriteLine($"Top Button Ch:{changeMessage.Channel}, ID:{changeMessage.Controller}, Velocity:{changeMessage.ControlValue}");
 
                     // Get a reference to the button
                     var topButton = topButtons.FirstOrDefault(button => button.Id == changeMessage.Controller);
 
                     // If the top button could not be found (should never happen), return
                     if (topButton == null) return;
-
+                    topButton.State = changeMessage.ControlValue > 0 
+                        ? LaunchpadButtonState.Pressed 
+                        : LaunchpadButtonState.Released;
                     whenButtonStateChanged.OnNext(topButton);
                     break;
             }
@@ -272,6 +274,12 @@ namespace Launchpad.NET
         public void SetColumnColor(int column, LaunchpadMk2Color color)
         {
             var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
+        public void SetColumnColor(int column, Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)color.R, (byte)color.G, (byte)color.B, 247 };
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
         }
 
