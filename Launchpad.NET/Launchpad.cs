@@ -38,6 +38,7 @@ namespace Launchpad.NET
         /// Observable event for when a button on the launchpad is pressed or released
         /// </summary>
         public IObservable<ILaunchpadButton> WhenButtonStateChanged => whenButtonStateChanged;
+        public IObservable<Unit> WhenReset => whenReset;
 
         public Launchpad()
         {
@@ -112,6 +113,8 @@ namespace Launchpad.NET
         public abstract void SendMessage(IMidiMessage message);
 
         public abstract void UnregisterEffect(ILaunchpadEffect effect);
+
+        public abstract void UnregisterAllEffects();
     }
 
     public static class Novation

@@ -8,6 +8,8 @@ using Launchpad.NET.Effects;
 using Launchpad.NET.Models;
 using Windows.UI;
 using System;
+using System.Reactive;
+using System.Threading;
 
 // https://global.novationmusic.com/sites/default/files/novation/downloads/10529/launchpad-mk2-programmers-reference-guide_0.pdf
 
@@ -60,6 +62,8 @@ namespace Launchpad.NET
 
         public List<LaunchpadButton> SideButtons => sideButtons;
 
+        public Timer resetTimer;
+
         public LaunchpadMk2(string name, MidiInPort inPort, IMidiOutPort outPort)
         {
             Name = name;
@@ -104,14 +108,19 @@ namespace Launchpad.NET
             SetAllButtonsColor(LaunchpadMk2Color.Off);
         }
 
+        /// <summary>
+        /// Clears all square grod buttons on the Mk2
+        /// </summary>
         public void ClearGrid()
         {
-            // Create all the grid buttons            
-            for (var y = 0; y < 8; y++)
-                for (var x = 0; x < 8; x++)
-                {
-                    Grid[x, y].Color = (byte)LaunchpadMk2Color.Off;
-                }
+            var commandBytes = new List<byte>();
+            for(var row = 1; row < 9; row++)
+            for (var x = 1; x < 9; x++)
+            {
+                var buttonId = row * 10 + x;
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, (byte)0, 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }
 
         public void ClearGridRow(int row)
@@ -187,6 +196,28 @@ namespace Launchpad.NET
 
                         // Notify any observable subscribers of the event
                         whenButtonStateChanged.OnNext(gridButton);
+
+                        //if(gridButton.Id == 11 ||
+                        //   gridButton.Id == 18 ||
+                        //   gridButton.Id == 81 ||
+                        //   gridButton.Id == 88 )
+                        //{
+                        //    if(Grid[0, 0].State == LaunchpadButtonState.Pressed &&
+                        //       Grid[0, 7].State == LaunchpadButtonState.Pressed &&
+                        //       Grid[7, 7].State == LaunchpadButtonState.Pressed &&
+                        //       Grid[7, 0].State == LaunchpadButtonState.Pressed )
+                        //    {
+                        //        resetTimer = new Timer((state)=> {
+                        //            UnregisterAllEffects();
+                        //            whenReset.OnNext(Unit.Default);
+                        //        }, null, 0, 5000);
+                        //    }
+                        //    else
+                        //    {
+                        //        resetTimer?.Dispose();
+                        //    }
+                        //    whenReset.OnNext(Unit.Default);
+                        //}
                     }
                     break;
                 case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
@@ -205,12 +236,35 @@ namespace Launchpad.NET
             }
         }
 
+        public void PulseButton(int id, LaunchpadMk2Color color)
+        {
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 40, 0, (byte)id, (byte)color, 247 };
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
         public void PulseButton(int x, int y, LaunchpadMk2Color color)
         {
             //var command = new byte[] { 240, 0, 32, 41, 2, 24, 40, Grid[x, y].Id, (byte)color, 247 };
             //outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+            try
+            {
+                outPort?.SendMessage(new MidiNoteOnMessage(2, Grid[x, y].Id, (byte)color));
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine("Could not pulse button. " + ex.Message);
+            }
+        }
 
-            outPort?.SendMessage(new MidiNoteOnMessage(2, Grid[x, y].Id, (byte)color));
+        public void PulseSide(LaunchpadMk2Color color)
+        {
+            var commandBytes = new List<byte>();
+            for (var x = 1; x < 9; x++)
+            {
+                var buttonId = x * 10 + 9;
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 40, 0, (byte)buttonId, (byte)color, 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }
 
         public override void SendMessage(IMidiMessage message)
@@ -279,8 +333,29 @@ namespace Launchpad.NET
 
         public void SetColumnColor(int column, Color color)
         {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)color.R, (byte)color.G, (byte)color.B, 247 };
+            var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+        }
+
+        public void SetGridColor(Color color)
+        {
+            var commandBytes = new List<byte>();
+            for(var y = 0; y < 8; y++)
+            for (var x = 0; x < 8; x++)
+            {
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)Grid[x, y].Id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+        }
+
+        public void SetGridRowColor(int row, Color color)
+        {
+            var commandBytes = new List<byte>();
+            for (var x = 0; x < 8; x++)
+            {
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)Grid[x, row].Id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }
 
         public void SetRowColor(int row, LaunchpadMk2Color color)
@@ -319,6 +394,21 @@ namespace Launchpad.NET
             EffectsTimers[effect].Dispose();
             EffectsTimers.Remove(effect);
             effect.Dispose();
+        }
+
+        public override void UnregisterAllEffects()
+        {
+            foreach(var effect in EffectsDisposables)
+            {
+                effect.Key.Dispose();
+                effect.Value.Dispose();
+            }
+            EffectsDisposables.Clear();
+            foreach (var effect in EffectsTimers)
+            {
+                effect.Value.Dispose();
+            }
+            EffectsTimers.Clear();
         }
     }
 }
