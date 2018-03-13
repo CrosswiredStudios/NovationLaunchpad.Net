@@ -57,47 +57,66 @@ namespace Launchpad.NET
     public class LaunchpadMk2 : Launchpad, ILaunchpad
     {
         public LaunchpadMk2Button[,] Grid { get; }
-
         public Color[,] GridBuffer { get; private set; }
-
+        public bool IsSimulated { get; }
         public List<LaunchpadMk2Button> SideButtons => sideButtons;
+        public List<LaunchpadMk2Button> TopButtons => sideButtons;
+        int resetCount;
+        Timer resetTimer;
 
-        public Timer resetTimer;
-
-        /// <summary>
-        /// Creates a launchpad dummy object that can be used to simulate launchpad input
-        /// </summary>
-        /// <param name="name"></param>
-        public LaunchpadMk2(string name)
-        {
-            Name = name;
-        }
-
-        public LaunchpadMk2(string name, MidiInPort inPort, IMidiOutPort outPort)
+        public LaunchpadMk2(string name, MidiInPort inPort = null, IMidiOutPort outPort = null)
         {
             Name = name;
             this.inPort = inPort;
             this.outPort = outPort;
             gridButtons = new List<LaunchpadMk2Button>();
+            resetCount = 0;
             sideButtons = new List<LaunchpadMk2Button>();
-            topButtons = new List<LaunchpadTopButton>();
+            topButtons = new List<LaunchpadMk2TopButton>();
             Grid = new LaunchpadMk2Button[8, 8];
             GridBuffer = new Color[8, 8];
 
-            BuildButtons();
+            BuildButtons();            
 
-            
+            // Process resets triggered from launchpad
+            resetTimer = new Timer((state) => {
 
-            //Create all the top buttons
-            for (var x = 0; x < 8; x++)
-                topButtons.Add(new LaunchpadTopButton((byte)(x + 104), (byte)LaunchpadMk2Color.Off, outPort));
+                // If the user is pressing the 4 corner grid buttons
+                if (Grid[0, 0].State == LaunchpadButtonState.Pressed &&
+                    Grid[0, 7].State == LaunchpadButtonState.Pressed &&
+                    Grid[7, 7].State == LaunchpadButtonState.Pressed &&
+                    Grid[7, 0].State == LaunchpadButtonState.Pressed)
+                {
+                    // Increase the reset count
+                    resetCount++;
 
-            //ClearAll();
+                    // If the user has held the buttons for 10 seconds
+                    if (resetCount > 10)
+                    {
+                        // Notify anyone interested in the event
+                        whenReset.OnNext(Unit.Default);
+                    }
+                }
+                else // If the user is not pressing the 4 corner buttons
+                {
+                    // Reset the count
+                    resetCount = 0;
+                }
+            }, null, 0, 1000);
 
-            // Process messages from device
-            inPort.MessageReceived += InPort_MessageReceived;
+            // Flag as simulated mode if no connection provided
+            IsSimulated = inPort == null || outPort == null;
+
+            if(!IsSimulated)
+            {
+                // Process messages from device
+                inPort.MessageReceived += InPort_MessageReceived;
+            }
         }
 
+        /// <summary>
+        /// Creates refrences to all buttons on the LaunchpadMk2
+        /// </summary>
         void BuildButtons()
         {
             CreateGridButtons();
@@ -159,9 +178,13 @@ namespace Launchpad.NET
             }
         }
 
+        /// <summary>
+        /// Creates the objects that represent the top buttons
+        /// </summary>
         void CreateTopButtons()
-        {
-
+        {            
+            for (var x = 0; x < 8; x++)
+                topButtons.Add(new LaunchpadMk2TopButton((byte)(x + 104), Colors.Black, outPort));
         }
 
         public void FlushGridBuffer(bool clearBufferAfter = true)
@@ -199,69 +222,21 @@ namespace Launchpad.NET
             // Determine what kind of message it is
             switch (args.Message)
             {
-                case MidiNoteOnMessage onMessage: // Grid and side buttons come as Midi Note On Message
-
-                    Debug.WriteLine($"Grid Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
-
+                // Grid and side buttons come as Midi Note On Message
+                case MidiNoteOnMessage onMessage: 
+                    // If it's a side button
                     if (onMessage.Note % 10 == 9)
                     {
-                        var sideButton = sideButtons.FirstOrDefault(button => button.Id == onMessage.Note);
-                        sideButton.State = onMessage.Velocity == 0
-                            ? LaunchpadButtonState.Released
-                            : LaunchpadButtonState.Pressed;
-                        whenButtonStateChanged.OnNext(sideButton);
+                        UpdateSideButton(onMessage);
                     }
-                    else
+                    else // If it's a grid button
                     {
-                        // Get a reference to the button
-                        var gridButton = Grid[onMessage.Note % 10 - 1, onMessage.Note / 10 - 1];
-
-                        // If the grid button could not be found (should never happen), return
-                        if (gridButton == null) return;
-
-                        // Update the state (Launchpad sends midi on message for press and release - Velocity 0 is released, 127 is pressed)
-                        gridButton.State = onMessage.Velocity == 0
-                            ? LaunchpadButtonState.Released
-                            : LaunchpadButtonState.Pressed;
-
-                        // Notify any observable subscribers of the event
-                        whenButtonStateChanged.OnNext(gridButton);
-
-                        //if(gridButton.Id == 11 ||
-                        //   gridButton.Id == 18 ||
-                        //   gridButton.Id == 81 ||
-                        //   gridButton.Id == 88 )
-                        //{
-                        //    if(Grid[0, 0].State == LaunchpadButtonState.Pressed &&
-                        //       Grid[0, 7].State == LaunchpadButtonState.Pressed &&
-                        //       Grid[7, 7].State == LaunchpadButtonState.Pressed &&
-                        //       Grid[7, 0].State == LaunchpadButtonState.Pressed )
-                        //    {
-                        //        resetTimer = new Timer((state)=> {
-                        //            UnregisterAllEffects();
-                        //            whenReset.OnNext(Unit.Default);
-                        //        }, null, 0, 5000);
-                        //    }
-                        //    else
-                        //    {
-                        //        resetTimer?.Dispose();
-                        //    }
-                        //    whenReset.OnNext(Unit.Default);
-                        //}
+                        UpdateGridButton(onMessage);                        
                     }
                     break;
-                case MidiControlChangeMessage changeMessage: // Top row comes as Control Change message
-                    Debug.WriteLine($"Top Button Ch:{changeMessage.Channel}, ID:{changeMessage.Controller}, Velocity:{changeMessage.ControlValue}");
-
-                    // Get a reference to the button
-                    var topButton = topButtons.FirstOrDefault(button => button.Id == changeMessage.Controller);
-
-                    // If the top button could not be found (should never happen), return
-                    if (topButton == null) return;
-                    topButton.State = changeMessage.ControlValue > 0 
-                        ? LaunchpadButtonState.Pressed 
-                        : LaunchpadButtonState.Released;
-                    whenButtonStateChanged.OnNext(topButton);
+                // Top row comes as Control Change message
+                case MidiControlChangeMessage changeMessage: 
+                    UpdateTopButton(changeMessage);
                     break;
             }
         }
@@ -315,53 +290,59 @@ namespace Launchpad.NET
             }
         }
 
-        public void SetButtonColor(int id, Color color)
+        /// <summary>
+        /// Sets the color of a grid button
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="color"></param>
+        public void SetGridButtonColor(int id, Color color)
         {
             try
             {
-                var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
-                outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
+                // Logisticaly update the button
+                var button = Grid[id % 10 - 1, id / 10 - 1];
+                button.Color = color;
 
+                // If the launchpad is not simulated
+                if (!IsSimulated)
+                {
+                    // Create and send a command to set the light color
+                    var command = new byte[]
+                    {
+                        240, 0, 32, 41, 2, 24, 11,
+                        (byte) id,
+                        (byte) (color.R / 4),
+                        (byte) (color.G / 4),
+                        (byte) (color.B / 4),
+                        247
+                    };
+                    outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Unable to set the grid button color. {ex}");
+            }
         }
 
+        /// <summary>
+        /// Sets the color of a grid button
+        /// </summary>
+        /// <param name="x">Grid x coordinate</param>
+        /// <param name="y">Grid y coordinate</param>
+        /// <param name="color">The color to set the button to</param>
         public void SetGridButtonColor(int x, int y, Color color)
         {
-            try
-            {
-                var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x - 1, y - 1].Id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
-                outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
+            // Convert x-y to id
+            SetGridButtonColor((y+1) * 10 + x+1, color);
         }
 
-        public void SetButtonColor(int x, int y, LaunchpadMk2Color color)
-        {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 10, Grid[x, y].Id, (byte)color, 247 };
-            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-        }
-
-        public void SetButtonColor(int x, int y, byte r, byte g, byte b)
-        {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, Grid[x, y].Id, r, g, b, 247 };
-            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-
-        }
-
-        public void SetColumnColor(int column, LaunchpadMk2Color color)
-        {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)color, 247 };
-            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-        }
-
-        public void SetColumnColor(int column, Color color)
+        /// <summary>
+        /// Sets the color of an entire column
+        /// </summary>
+        /// <param name="column">The column to color 0 - 7</param>
+        /// <param name="color">The color to apply to the buttons</param>
+        public void SetGridColumnColor(int column, Color color)
         {
             var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
@@ -417,6 +398,44 @@ namespace Launchpad.NET
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
         }
 
+        /// <summary>
+        /// Simulates pressing a button on the launchpad mk2
+        /// </summary>
+        /// <param name="id">The id of the button to simulate</param>
+        public void SimulateGridPress(int id)
+        {            
+            UpdateGridButton(new MidiNoteOnMessage(0, (byte)id, 127));
+        }
+
+        /// <summary>
+        /// Simulates pressing a button on the launchpad mk2
+        /// </summary>
+        /// <param name="x">The X coordinate of the button, 0 - 7</param>
+        /// <param name="y">The Y coordinate of the button, 0 - 7</param>
+        public void SimulateGridPress(int x, int y)
+        {
+            SimulateGridPress((y + 1) * 10 + x + 1);
+        }
+
+        /// <summary>
+        /// Simulates releasing a button on the launchpad mk2
+        /// </summary>
+        /// <param name="id">The id of the button to simulate</param>
+        public void SimulateGridRelease(int id)
+        {
+            UpdateGridButton(new MidiNoteOnMessage(0, (byte)id, 0));
+        }
+
+        /// <summary>
+        /// Simulates releasing a button on the launchpad mk2
+        /// </summary>
+        /// <param name="x">The X coordinate of the button, 0 - 7</param>
+        /// <param name="y">The Y coordinate of the button, 0 - 7</param>
+        public void SimulateGridRelease(int x, int y)
+        {
+            SimulateGridRelease((y + 1) * 10 + x + 1);
+        }
+
         public override void UnregisterEffect(ILaunchpadEffect effect)
         {
             EffectsDisposables[effect].Dispose();
@@ -439,6 +458,96 @@ namespace Launchpad.NET
                 effect.Value.Dispose();
             }
             EffectsTimers.Clear();
+        }
+
+        /// <summary>
+        /// Updates the state of a grid button
+        /// </summary>
+        /// <param name="onMessage"></param>
+        void UpdateGridButton(MidiNoteOnMessage onMessage)
+        {
+            Debug.WriteLine($"Side Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
+
+            try
+            {
+                // Get a reference to the grid button
+                var gridButton = Grid[onMessage.Note % 10 - 1, onMessage.Note / 10 - 1];
+
+                // If the grid button could not be found (should never happen), return
+                if (gridButton == null) return;
+
+                // Update the state (Launchpad sends midi on message for press and release - Velocity 0 is released, 127 is pressed)
+                gridButton.State = onMessage.Velocity == 0
+                    ? LaunchpadButtonState.Released
+                    : LaunchpadButtonState.Pressed;
+
+                // Notify any observable subscribers of the event
+                whenButtonStateChanged.OnNext(gridButton);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not update side button. {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Updates the state of a side button
+        /// </summary>
+        /// <param name="onMessage"></param>
+        void UpdateSideButton(MidiNoteOnMessage onMessage)
+        {
+            Debug.WriteLine($"Side Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
+
+            try
+            {
+                // Get a reference to the button
+                var sideButton = sideButtons.FirstOrDefault(button => button.Id == onMessage.Note);
+
+                // If the side button could not be found (should never happen), return
+                if (sideButton == null) return;
+
+                // Update its state
+                sideButton.State = onMessage.Velocity == 0
+                    ? LaunchpadButtonState.Released
+                    : LaunchpadButtonState.Pressed;
+
+                // Notify people interested in this event
+                whenButtonStateChanged.OnNext(sideButton);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not update side button. {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Updates the state of a top button
+        /// </summary>
+        /// <param name="changeMessage"></param>
+        void UpdateTopButton(MidiControlChangeMessage changeMessage)
+        {
+            Debug.WriteLine($"Top Button Ch:{changeMessage.Channel}, ID:{changeMessage.Controller}, Velocity:{changeMessage.ControlValue}");
+
+            try
+            {
+                // Get a reference to the button
+                var topButton = topButtons.FirstOrDefault(button => button.Id == changeMessage.Controller);
+
+                // If the top button could not be found (should never happen), return
+                if (topButton == null) return;
+
+                // Update its state
+                topButton.State = changeMessage.ControlValue > 0
+                    ? LaunchpadButtonState.Pressed
+                    : LaunchpadButtonState.Released;
+
+                // Notify people interested in this event
+                whenButtonStateChanged.OnNext(topButton);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not update top button. {ex}");
+            }
         }
     }
 }

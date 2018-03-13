@@ -4,37 +4,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Midi;
+using Windows.UI;
 
 namespace Launchpad.NET.Models
 {
-    public class LaunchpadTopButton : ILaunchpadButton
+    public class LaunchpadMk2TopButton : ViewModelBase, ILaunchpadButton
     {
-        byte color;
+        Color color;
         readonly IMidiOutPort outPort;
 
         public byte Channel { get; set; }
-
-        public byte Color
+        public Color Color
         {
             get => color;
             set
             {
-                outPort?.SendMessage(new MidiControlChangeMessage(0, Id, (byte)Color));
                 color = value;
+                RaisePropertyChanged();
             }
         }
-
         public byte Id { get; set; }
         public LaunchpadButtonState State { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public LaunchpadTopButton(byte id, byte color)
+
+        public LaunchpadMk2TopButton(byte id, Color color)
         {
             Id = id;
             Color = color;
         }
 
-        public LaunchpadTopButton(byte id, byte color, IMidiOutPort outPort)
+        public LaunchpadMk2TopButton(byte id, Color color, IMidiOutPort outPort)
         {
             this.outPort = outPort;
             Id = id;

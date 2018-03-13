@@ -27,7 +27,7 @@ namespace Launchpad.NET
         protected MidiInPort inPort;
         protected IMidiOutPort outPort;
         protected List<LaunchpadMk2Button> sideButtons;
-        protected List<LaunchpadTopButton> topButtons;
+        protected List<LaunchpadMk2TopButton> topButtons;
         protected readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();
         protected readonly Subject<Unit> whenReset = new Subject<Unit>();
 

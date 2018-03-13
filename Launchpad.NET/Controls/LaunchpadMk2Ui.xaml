@@ -9,13 +9,23 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
+    <UserControl.Resources>
+        <ResourceDictionary >
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/LaunchpadMk2.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <RelativePanel
         x:Name="RpContainer"
         HorizontalAlignment="Center"
         VerticalAlignment="Stretch">
         <Grid
             Background="Gray"
-            Padding="8">
+            CornerRadius="3"
+            Padding="8"
+            VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="32" />
                 <ColumnDefinition Width="32" />
@@ -37,19 +47,524 @@
                 <RowDefinition Height="32" />
             </Grid.RowDefinitions>
             <RelativePanel
-                x:Name="RpButton11"
-                Background="Black"                
+                x:Name="RpButton00"
+                Background="{x:Bind Grid00.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
                 CornerRadius="5"
                 Grid.Column="0"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton10"
+                Background="{x:Bind Grid10.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton20"
+                Background="{x:Bind Grid20.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton30"
+                Background="{x:Bind Grid30.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
                 Grid.Row="7">
             </RelativePanel>
             <RelativePanel
-                x:Name="RpButton12"
-                Background="Black"
+                x:Name="RpButton40"
+                Background="{x:Bind Grid40.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton50"
+                Background="{x:Bind Grid50.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="5"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton60"
+                Background="{x:Bind Grid60.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton70"
+                Background="{x:Bind Grid70.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton01"
+                Background="{x:Bind Grid01.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton11"
+                Background="{x:Bind Grid11.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
                 CornerRadius="5"
                 Grid.Column="1"
-                Grid.Row="7">
+                Grid.Row="6"
+                Margin="1">
             </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton21"
+                Background="{x:Bind Grid21.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton31"
+                Background="{x:Bind Grid31.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton41"
+                Background="{x:Bind Grid41.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton51"
+                Background="{x:Bind Grid51.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="5"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton61"
+                Background="{x:Bind Grid61.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton71"
+                Background="{x:Bind Grid71.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton02"
+                Background="{x:Bind Grid02.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton12"
+                Background="{x:Bind Grid12.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton22"
+                Background="{x:Bind Grid22.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton32"
+                Background="{x:Bind Grid32.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton42"
+                Background="{x:Bind Grid42.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton52"
+                Background="{x:Bind Grid52.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton62"
+                Background="{x:Bind Grid62.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton72"
+                Background="{x:Bind Grid72.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+
+            <RelativePanel
+                x:Name="RpButton03"
+                Background="{x:Bind Grid03.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton13"
+                Background="{x:Bind Grid13.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton23"
+                Background="{x:Bind Grid23.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton33"
+                Background="{x:Bind Grid33.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton43"
+                Background="{x:Bind Grid43.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton53"
+                Background="{x:Bind Grid53.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton63"
+                Background="{x:Bind Grid63.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton73"
+                Background="{x:Bind Grid73.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton04"
+                Background="{x:Bind Grid04.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton14"
+                Background="{x:Bind Grid14.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton24"
+                Background="{x:Bind Grid24.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton34"
+                Background="{x:Bind Grid32.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton44"
+                Background="{x:Bind Grid44.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton54"
+                Background="{x:Bind Grid54.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton64"
+                Background="{x:Bind Grid64.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton74"
+                Background="{x:Bind Grid74.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton05"
+                Background="{x:Bind Grid05.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton15"
+                Background="{x:Bind Grid15.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton25"
+                Background="{x:Bind Grid25.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton35"
+                Background="{x:Bind Grid35.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton45"
+                Background="{x:Bind Grid45.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton55"
+                Background="{x:Bind Grid55.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton65"
+                Background="{x:Bind Grid65.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton75"
+                Background="{x:Bind Grid75.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton06"
+                Background="{x:Bind Grid06.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton16"
+                Background="{x:Bind Grid16.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton26"
+                Background="{x:Bind Grid26.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton36"
+                Background="{x:Bind Grid36.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton46"
+                Background="{x:Bind Grid46.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton56"
+                Background="{x:Bind Grid56.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton66"
+                Background="{x:Bind Grid66.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton76"
+                Background="{x:Bind Grid76.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton07"
+                Background="{x:Bind Grid07.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton17"
+                Background="{x:Bind Grid17.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton27"
+                Background="{x:Bind Grid27.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="2"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton37"
+                Background="{x:Bind Grid37.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="3"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton47"
+                Background="{x:Bind Grid47.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="4"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton57"
+                Background="{x:Bind Grid57.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton67"
+                Background="{x:Bind Grid67.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="6"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton77"
+                Background="{x:Bind Grid77.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                CornerRadius="5"
+                Grid.Column="7"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+
         </Grid>
         
     </RelativePanel>
