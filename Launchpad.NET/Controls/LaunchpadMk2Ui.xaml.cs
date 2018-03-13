@@ -129,7 +129,6 @@ namespace Launchpad.NET.Controls
 
         void SimulatePress(int id)
         {
-            LaunchpadMk2?.SetGridButtonColor(id, Colors.Red);
             LaunchpadMk2?.SimulateGridPress(id);
             LaunchpadMk2?.SimulateGridRelease(id);
         }

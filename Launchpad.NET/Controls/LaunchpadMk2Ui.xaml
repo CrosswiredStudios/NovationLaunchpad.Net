@@ -330,7 +330,7 @@
             </RelativePanel>
             <RelativePanel
                 x:Name="RpButton34"
-                Background="{x:Bind Grid32.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
+                Background="{x:Bind Grid34.Color, Converter={StaticResource ColorToBrush}, Mode=OneWay}"
                 CornerRadius="5"
                 Grid.Column="3"
                 Grid.Row="3"
