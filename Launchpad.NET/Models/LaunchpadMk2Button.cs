@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Midi;
+using Windows.UI;
 
 namespace Launchpad.NET.Models
 {
@@ -12,37 +13,34 @@ namespace Launchpad.NET.Models
     public interface ILaunchpadButton
     {
         byte Channel { get; set; }
-        byte Color { get; set; }
+        Color Color { get; set; }
         byte Id { get; set; }
         LaunchpadButtonState State { get; set; }
         int X { get; set; }
         int Y { get; set; }
     }
 
-    public class LaunchpadButton : ILaunchpadButton
+    public class LaunchpadMk2Button : ViewModelBase,  ILaunchpadButton
     {        
-        byte color;
+        Color color;
         readonly IMidiOutPort outPort;
 
         public byte Channel { get; set; }
-
-        public byte Color
+        public Color Color
         {
             get => color;
             set
             {
-                //outPort?.SendMessage(new MidiNoteOnMessage(Channel, Id, (byte)Color));
                 color = value;
+                RaisePropertyChanged();
             }
         }
-
         public byte Id { get; set; }
-
+        public LaunchpadButtonState State { get; set; }
         public int X { get; set; }
-
         public int Y { get; set; }
 
-        public LaunchpadButton(byte channel, byte id, byte color)
+        public LaunchpadMk2Button(byte channel, byte id, Color color)
         {
             this.color = color;
             Channel = channel;            
@@ -50,31 +48,16 @@ namespace Launchpad.NET.Models
             State = LaunchpadButtonState.Released;
         }
 
-        public LaunchpadButton(byte channel, byte id, byte color, IMidiOutPort outPort)
+        public LaunchpadMk2Button(byte channel, int x, int y, Color color, IMidiOutPort outPort)
         {
             this.color = color;
             this.outPort = outPort;
             Channel = channel;
-            Id = id;            
+            // LaunchpadMk2 numbering starts on the bottom left at 11. +1 as you go right, +10 as you go up
+            Id = (byte)(((y+1) * 10) + x+1);            
             State = LaunchpadButtonState.Released;
+            X = x;
+            Y = y;
         }
-
-        public void StartPulse(LaunchpadMk2Color color)
-        {
-            outPort?.SendMessage(new MidiNoteOnMessage(2, Id, (byte)color));
-        }
-
-        public void StopPulse()
-        {
-            outPort?.SendMessage(new MidiNoteOnMessage(1, Id, 0));
-        }
-
-        public void SetColor(byte r, byte g, byte b)
-        {
-            var command = new byte[] { 240, 0, 32, 41, 2, 24, 10, Id, r, g, b, 247 };
-            outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
-        }
-
-        public LaunchpadButtonState State { get; set; }
     }
 }

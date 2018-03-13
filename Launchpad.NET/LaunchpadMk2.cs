@@ -56,42 +56,37 @@ namespace Launchpad.NET
 
     public class LaunchpadMk2 : Launchpad, ILaunchpad
     {
-        public LaunchpadButton[,] Grid { get; }
+        public LaunchpadMk2Button[,] Grid { get; }
 
         public Color[,] GridBuffer { get; private set; }
 
-        public List<LaunchpadButton> SideButtons => sideButtons;
+        public List<LaunchpadMk2Button> SideButtons => sideButtons;
 
         public Timer resetTimer;
+
+        /// <summary>
+        /// Creates a launchpad dummy object that can be used to simulate launchpad input
+        /// </summary>
+        /// <param name="name"></param>
+        public LaunchpadMk2(string name)
+        {
+            Name = name;
+        }
 
         public LaunchpadMk2(string name, MidiInPort inPort, IMidiOutPort outPort)
         {
             Name = name;
             this.inPort = inPort;
             this.outPort = outPort;
-            gridButtons = new List<LaunchpadButton>();
-            sideButtons = new List<LaunchpadButton>();
+            gridButtons = new List<LaunchpadMk2Button>();
+            sideButtons = new List<LaunchpadMk2Button>();
             topButtons = new List<LaunchpadTopButton>();
-            Grid = new LaunchpadButton[8, 8];
+            Grid = new LaunchpadMk2Button[8, 8];
             GridBuffer = new Color[8, 8];
 
-            // Create all the grid buttons            
-            for (var y = 10; y <= 80; y = y + 10)
-                for (var x = 1; x <= 8; x++)
-                {
-                    var button = new LaunchpadButton(0, (byte)(y + x), (byte)LaunchpadMk2Color.Off, outPort);
-                    //gridButtons.Add(button);
-                    button.X = x - 1;
-                    button.Y = y / 10 - 1;
-                    Grid[x - 1, y / 10 - 1] = button;
-                    GridBuffer[x - 1, y / 10 - 1] = Colors.Black;
-                    //button.Color = (byte)LaunchpadMk2Color.Off;
-                }
+            BuildButtons();
 
-            for (var x = 1; x < 9; x++)
-            {
-                sideButtons.Add(new LaunchpadButton(0, (byte)(10 * x + 9), (byte)LaunchpadMk2Color.Off, outPort));
-            }
+            
 
             //Create all the top buttons
             for (var x = 0; x < 8; x++)
@@ -101,6 +96,13 @@ namespace Launchpad.NET
 
             // Process messages from device
             inPort.MessageReceived += InPort_MessageReceived;
+        }
+
+        void BuildButtons()
+        {
+            CreateGridButtons();
+            CreateSideButtons();
+            CreateTopButtons();
         }
 
         public void ClearAll()
@@ -132,6 +134,34 @@ namespace Launchpad.NET
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, (byte)LaunchpadMk2Color.Off, 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+        }
+
+        /// <summary>
+        /// Creates the objects that represent the grid buttons
+        /// </summary>
+        void CreateGridButtons()
+        {         
+            for(var y = 0; y < 8; y++)
+            for (var x = 0; x < 8; x++)
+            {
+                Grid[x, y] = new LaunchpadMk2Button(0, x, y, Colors.Black, outPort);
+            }
+        }
+
+        /// <summary>
+        /// Creates the objects that represent the side buttons
+        /// </summary>
+        void CreateSideButtons()
+        {
+            for (var y = 0; y < 8; y++)
+            {
+                sideButtons.Add(new LaunchpadMk2Button(0, 8, y, Colors.Black, outPort));
+            }
+        }
+
+        void CreateTopButtons()
+        {
+
         }
 
         public void FlushGridBuffer(bool clearBufferAfter = true)

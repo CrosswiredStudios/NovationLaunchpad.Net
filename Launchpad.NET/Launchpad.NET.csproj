@@ -106,13 +106,18 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controls\LaunchpadMk2Ui.xaml.cs">
+      <DependentUpon>LaunchpadMk2Ui.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Effects\ILaunchpadEffect.cs" />
     <Compile Include="Effects\PiskelEffect.cs" />
     <Compile Include="LaunchpadMk2.cs" />
     <Compile Include="Launchpad.cs" />
-    <Compile Include="Models\LaunchpadButton.cs" />
+    <Compile Include="Models\LaunchpadMk2Button.cs" />
     <Compile Include="Models\LaunchpadButtonCommand.cs" />
     <Compile Include="Models\LaunchpadTopButton.cs" />
+    <Compile Include="Models\Novation.cs" />
+    <Compile Include="Models\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Launchpad.NET.rd.xml" />
   </ItemGroup>
@@ -132,6 +137,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="launchpad.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\LaunchpadMk2Ui.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
