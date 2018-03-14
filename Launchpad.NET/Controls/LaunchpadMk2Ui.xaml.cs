@@ -52,6 +52,8 @@ namespace Launchpad.NET.Controls
             }
         }
 
+        public LaunchpadMk2TopButton Top104, Top105, Top106, Top107, Top108, Top109, Top110, Top111;
+
         public LaunchpadMk2Button Grid00, Grid10, Grid20, Grid30, Grid40, Grid50, Grid60, Grid70,
                                   Grid01, Grid11, Grid21, Grid31, Grid41, Grid51, Grid61, Grid71,
                                   Grid02, Grid12, Grid22, Grid32, Grid42, Grid52, Grid62, Grid72,
@@ -60,6 +62,8 @@ namespace Launchpad.NET.Controls
                                   Grid05, Grid15, Grid25, Grid35, Grid45, Grid55, Grid65, Grid75,
                                   Grid06, Grid16, Grid26, Grid36, Grid46, Grid56, Grid66, Grid76,
                                   Grid07, Grid17, Grid27, Grid37, Grid47, Grid57, Grid67, Grid77;
+
+        public LaunchpadMk2Button Side70, Side71, Side72, Side73, Side74, Side75, Side76, Side77;
 
         public LaunchpadMk2Ui()
         {
@@ -143,74 +147,105 @@ namespace Launchpad.NET.Controls
             LaunchpadMk2?.SimulateGridRelease(id);
         }
 
+        /// <summary>
+        /// Binds the Launchpad Ui control to the values of a LaunchpadMk2 model
+        /// </summary>
         void UpdateButtons()
         {
-            if (LaunchpadMk2?.Grid == null) return;
+            // Bind to all the top buttons
+            if (LaunchpadMk2?.TopButtons != null)
+            {
+                Top104 = LaunchpadMk2.TopButtons[0];
+                Top105 = LaunchpadMk2.TopButtons[1];
+                Top106 = LaunchpadMk2.TopButtons[2];
+                Top107 = LaunchpadMk2.TopButtons[3];
+                Top108 = LaunchpadMk2.TopButtons[4];
+                Top109 = LaunchpadMk2.TopButtons[5];
+                Top110 = LaunchpadMk2.TopButtons[6];
+                Top111 = LaunchpadMk2.TopButtons[7];
+            }
 
-            Grid00 = LaunchpadMk2.Grid[0, 0];
-            Grid10 = LaunchpadMk2.Grid[1, 0];
-            Grid20 = LaunchpadMk2.Grid[2, 0];
-            Grid30 = LaunchpadMk2.Grid[3, 0];
-            Grid40 = LaunchpadMk2.Grid[4, 0];
-            Grid50 = LaunchpadMk2.Grid[5, 0];
-            Grid60 = LaunchpadMk2.Grid[6, 0];
-            Grid70 = LaunchpadMk2.Grid[7, 0];
-            Grid01 = LaunchpadMk2.Grid[0, 1];
-            Grid11 = LaunchpadMk2.Grid[1, 1];
-            Grid21 = LaunchpadMk2.Grid[2, 1];
-            Grid31 = LaunchpadMk2.Grid[3, 1];
-            Grid41 = LaunchpadMk2.Grid[4, 1];
-            Grid51 = LaunchpadMk2.Grid[5, 1];
-            Grid61 = LaunchpadMk2.Grid[6, 1];
-            Grid71 = LaunchpadMk2.Grid[7, 1];
-            Grid02 = LaunchpadMk2.Grid[0, 2];
-            Grid12 = LaunchpadMk2.Grid[1, 2];
-            Grid22 = LaunchpadMk2.Grid[2, 2];
-            Grid32 = LaunchpadMk2.Grid[3, 2];
-            Grid42 = LaunchpadMk2.Grid[4, 2];
-            Grid52 = LaunchpadMk2.Grid[5, 2];
-            Grid62 = LaunchpadMk2.Grid[6, 2];
-            Grid72 = LaunchpadMk2.Grid[7, 2];
-            Grid03 = LaunchpadMk2.Grid[0, 3];
-            Grid13 = LaunchpadMk2.Grid[1, 3];
-            Grid23 = LaunchpadMk2.Grid[2, 3];
-            Grid33 = LaunchpadMk2.Grid[3, 3];
-            Grid43 = LaunchpadMk2.Grid[4, 3];
-            Grid53 = LaunchpadMk2.Grid[5, 3];
-            Grid63 = LaunchpadMk2.Grid[6, 3];
-            Grid73 = LaunchpadMk2.Grid[7, 3];
-            Grid04 = LaunchpadMk2.Grid[0, 4];
-            Grid14 = LaunchpadMk2.Grid[1, 4];
-            Grid24 = LaunchpadMk2.Grid[2, 4];
-            Grid34 = LaunchpadMk2.Grid[3, 4];
-            Grid44 = LaunchpadMk2.Grid[4, 4];
-            Grid54 = LaunchpadMk2.Grid[5, 4];
-            Grid64 = LaunchpadMk2.Grid[6, 4];
-            Grid74 = LaunchpadMk2.Grid[7, 4];
-            Grid05 = LaunchpadMk2.Grid[0, 5];
-            Grid15 = LaunchpadMk2.Grid[1, 5];
-            Grid25 = LaunchpadMk2.Grid[2, 5];
-            Grid35 = LaunchpadMk2.Grid[3, 5];
-            Grid45 = LaunchpadMk2.Grid[4, 5];
-            Grid55 = LaunchpadMk2.Grid[5, 5];
-            Grid65 = LaunchpadMk2.Grid[6, 5];
-            Grid75 = LaunchpadMk2.Grid[7, 5];
-            Grid06 = LaunchpadMk2.Grid[0, 6];
-            Grid16 = LaunchpadMk2.Grid[1, 6];
-            Grid26 = LaunchpadMk2.Grid[2, 6];
-            Grid36 = LaunchpadMk2.Grid[3, 6];
-            Grid46 = LaunchpadMk2.Grid[4, 6];
-            Grid56 = LaunchpadMk2.Grid[5, 6];
-            Grid66 = LaunchpadMk2.Grid[6, 6];
-            Grid76 = LaunchpadMk2.Grid[7, 6];
-            Grid07 = LaunchpadMk2.Grid[0, 7];
-            Grid17 = LaunchpadMk2.Grid[1, 7];
-            Grid27 = LaunchpadMk2.Grid[2, 7];
-            Grid37 = LaunchpadMk2.Grid[3, 7];
-            Grid47 = LaunchpadMk2.Grid[4, 7];
-            Grid57 = LaunchpadMk2.Grid[5, 7];
-            Grid67 = LaunchpadMk2.Grid[6, 7];
-            Grid77 = LaunchpadMk2.Grid[7, 7];
+            // Bind to the grid buttons
+            if (LaunchpadMk2?.Grid != null)
+            {
+                Grid00 = LaunchpadMk2.Grid[0, 0];
+                Grid10 = LaunchpadMk2.Grid[1, 0];
+                Grid20 = LaunchpadMk2.Grid[2, 0];
+                Grid30 = LaunchpadMk2.Grid[3, 0];
+                Grid40 = LaunchpadMk2.Grid[4, 0];
+                Grid50 = LaunchpadMk2.Grid[5, 0];
+                Grid60 = LaunchpadMk2.Grid[6, 0];
+                Grid70 = LaunchpadMk2.Grid[7, 0];
+                Grid01 = LaunchpadMk2.Grid[0, 1];
+                Grid11 = LaunchpadMk2.Grid[1, 1];
+                Grid21 = LaunchpadMk2.Grid[2, 1];
+                Grid31 = LaunchpadMk2.Grid[3, 1];
+                Grid41 = LaunchpadMk2.Grid[4, 1];
+                Grid51 = LaunchpadMk2.Grid[5, 1];
+                Grid61 = LaunchpadMk2.Grid[6, 1];
+                Grid71 = LaunchpadMk2.Grid[7, 1];
+                Grid02 = LaunchpadMk2.Grid[0, 2];
+                Grid12 = LaunchpadMk2.Grid[1, 2];
+                Grid22 = LaunchpadMk2.Grid[2, 2];
+                Grid32 = LaunchpadMk2.Grid[3, 2];
+                Grid42 = LaunchpadMk2.Grid[4, 2];
+                Grid52 = LaunchpadMk2.Grid[5, 2];
+                Grid62 = LaunchpadMk2.Grid[6, 2];
+                Grid72 = LaunchpadMk2.Grid[7, 2];
+                Grid03 = LaunchpadMk2.Grid[0, 3];
+                Grid13 = LaunchpadMk2.Grid[1, 3];
+                Grid23 = LaunchpadMk2.Grid[2, 3];
+                Grid33 = LaunchpadMk2.Grid[3, 3];
+                Grid43 = LaunchpadMk2.Grid[4, 3];
+                Grid53 = LaunchpadMk2.Grid[5, 3];
+                Grid63 = LaunchpadMk2.Grid[6, 3];
+                Grid73 = LaunchpadMk2.Grid[7, 3];
+                Grid04 = LaunchpadMk2.Grid[0, 4];
+                Grid14 = LaunchpadMk2.Grid[1, 4];
+                Grid24 = LaunchpadMk2.Grid[2, 4];
+                Grid34 = LaunchpadMk2.Grid[3, 4];
+                Grid44 = LaunchpadMk2.Grid[4, 4];
+                Grid54 = LaunchpadMk2.Grid[5, 4];
+                Grid64 = LaunchpadMk2.Grid[6, 4];
+                Grid74 = LaunchpadMk2.Grid[7, 4];
+                Grid05 = LaunchpadMk2.Grid[0, 5];
+                Grid15 = LaunchpadMk2.Grid[1, 5];
+                Grid25 = LaunchpadMk2.Grid[2, 5];
+                Grid35 = LaunchpadMk2.Grid[3, 5];
+                Grid45 = LaunchpadMk2.Grid[4, 5];
+                Grid55 = LaunchpadMk2.Grid[5, 5];
+                Grid65 = LaunchpadMk2.Grid[6, 5];
+                Grid75 = LaunchpadMk2.Grid[7, 5];
+                Grid06 = LaunchpadMk2.Grid[0, 6];
+                Grid16 = LaunchpadMk2.Grid[1, 6];
+                Grid26 = LaunchpadMk2.Grid[2, 6];
+                Grid36 = LaunchpadMk2.Grid[3, 6];
+                Grid46 = LaunchpadMk2.Grid[4, 6];
+                Grid56 = LaunchpadMk2.Grid[5, 6];
+                Grid66 = LaunchpadMk2.Grid[6, 6];
+                Grid76 = LaunchpadMk2.Grid[7, 6];
+                Grid07 = LaunchpadMk2.Grid[0, 7];
+                Grid17 = LaunchpadMk2.Grid[1, 7];
+                Grid27 = LaunchpadMk2.Grid[2, 7];
+                Grid37 = LaunchpadMk2.Grid[3, 7];
+                Grid47 = LaunchpadMk2.Grid[4, 7];
+                Grid57 = LaunchpadMk2.Grid[5, 7];
+                Grid67 = LaunchpadMk2.Grid[6, 7];
+                Grid77 = LaunchpadMk2.Grid[7, 7];
+            }
+
+            // Bind to all the side buttons
+            if (LaunchpadMk2?.SideButtons != null)
+            {
+                Side70 = LaunchpadMk2.SideButtons[0];
+                Side71 = LaunchpadMk2.SideButtons[1];
+                Side72 = LaunchpadMk2.SideButtons[2];
+                Side73 = LaunchpadMk2.SideButtons[3];
+                Side74 = LaunchpadMk2.SideButtons[4];
+                Side75 = LaunchpadMk2.SideButtons[5];
+                Side76 = LaunchpadMk2.SideButtons[6];
+                Side77 = LaunchpadMk2.SideButtons[7];
+            }
 
             Bindings.Update();
         }

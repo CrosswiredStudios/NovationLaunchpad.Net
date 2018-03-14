@@ -61,6 +61,9 @@ namespace Launchpad.NET.Effects
 
     public class PiskelFile
     {
+        SKBitmap bitmap;
+
+        public List<Color[,]> Animation { get; }
         public string Description { get; }
         public int Fps { get; }
         public int Height { get; }
@@ -89,6 +92,27 @@ namespace Launchpad.NET.Effects
             for(var index = 0; index < layersData.Count; index++)
             {
                 Layers[index] = new PiskelLayer(layersData[index].ToString());
+            }
+
+            var pngData = Layers.First().Chunks.First().Data;
+            bitmap = SKBitmap.Decode(pngData);
+
+            var totalFrames = Layers.First().FrameCount;
+            var frameWidth = bitmap.Width / totalFrames;
+
+            for (var frameIndex = 0; frameIndex < totalFrames; frameIndex++)
+            {
+                var frame = new Color[frameWidth, bitmap.Height];
+                var xOffset = frameIndex * frameWidth;
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    for (var x = 0; x < frameWidth; x++)
+                    {
+                        var pixel = bitmap.Pixels[bitmap.Width * y + (x + xOffset)];
+                        frame[x, 7 - y] = Color.FromArgb(pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue);
+                    }
+                }
+                Animation.Add(frame);
             }
 
             Debug.WriteLine($"Successfully loaded piskel file for {Name}");

@@ -22,9 +22,92 @@
         HorizontalAlignment="Center"
         VerticalAlignment="Stretch">
         <Grid
+            x:Name="GTop">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <RelativePanel
+                x:Name="RpButton104"
+                Background="{x:Bind Top104.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton105"
+                Background="{x:Bind Top105.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton106"
+                Background="{x:Bind Top106.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="2"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton107"
+                Background="{x:Bind Top107.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="3"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton108"
+                Background="{x:Bind Top108.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="4"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton109"
+                Background="{x:Bind Top109.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                DataContext="52"
+                Grid.Column="5"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton110"
+                Background="{x:Bind Top110.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="6"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpButton111"
+                Background="{x:Bind Top111.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="7"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+        </Grid>
+        <Grid
+            x:Name="GGrid"
             Background="Gray"
             CornerRadius="3"
             Padding="8"
+            RelativePanel.Below="GTop"
             VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="32" />
@@ -238,7 +321,6 @@
                 Grid.Row="5"
                 Margin="1">
             </RelativePanel>
-
             <RelativePanel
                 x:Name="RpButton03"
                 Background="{x:Bind Grid03.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
@@ -566,7 +648,89 @@
             </RelativePanel>
 
         </Grid>
-        
+        <Grid
+            x:Name="GSide"
+            RelativePanel.Below="GTop"
+            RelativePanel.RightOf="GGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <RelativePanel
+                x:Name="RpSide70"
+                Background="{x:Bind Side70.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="7"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide71"
+                Background="{x:Bind Side71.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="6"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide72"
+                Background="{x:Bind Side72.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="5"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide73"
+                Background="{x:Bind Side73.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="4"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide74"
+                Background="{x:Bind Side74.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="3"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide75"
+                Background="{x:Bind Side75.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                DataContext="52"
+                Grid.Column="0"
+                Grid.Row="2"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide76"
+                Background="{x:Bind Side76.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="1">
+            </RelativePanel>
+            <RelativePanel
+                x:Name="RpSide77"
+                Background="{x:Bind Side77.Color, Converter={StaticResource ColorToBrush}, Mode=OneTime}"
+                CornerRadius="16"
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="1">
+            </RelativePanel>
+        </Grid>
     </RelativePanel>
     
 </UserControl>

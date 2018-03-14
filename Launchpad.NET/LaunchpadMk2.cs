@@ -60,7 +60,7 @@ namespace Launchpad.NET
         public Color[,] GridBuffer { get; private set; }
         public bool IsSimulated { get; }
         public List<LaunchpadMk2Button> SideButtons => sideButtons;
-        public List<LaunchpadMk2Button> TopButtons => sideButtons;
+        public List<LaunchpadMk2TopButton> TopButtons => topButtons;
         int resetCount;
         Timer resetTimer;
 
