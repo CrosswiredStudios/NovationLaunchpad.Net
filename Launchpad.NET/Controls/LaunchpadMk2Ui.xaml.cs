@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Launchpad.NET.Models;
+using System.Reactive.Linq;
+using System.Threading;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -39,6 +41,14 @@ namespace Launchpad.NET.Controls
                 SetValue(LaunchpadMk2Property, value);
 
                 UpdateButtons();
+
+                value
+                    .WhenButtonStateChanged
+                    .ObserveOn(SynchronizationContext.Current)
+                    .Subscribe(_ => 
+                    {
+                        Bindings.Update();
+                    });
             }
         }
 
@@ -201,6 +211,7 @@ namespace Launchpad.NET.Controls
             Grid57 = LaunchpadMk2.Grid[5, 7];
             Grid67 = LaunchpadMk2.Grid[6, 7];
             Grid77 = LaunchpadMk2.Grid[7, 7];
+
             Bindings.Update();
         }
 

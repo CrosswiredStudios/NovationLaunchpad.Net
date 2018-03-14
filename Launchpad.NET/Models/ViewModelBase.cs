@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace Launchpad.NET.Models
 { 
@@ -21,9 +23,9 @@ namespace Launchpad.NET.Models
         /// Updates a dependency property. 
         /// Using [CallMemberName] enforces that only the property this was called from is updated
         /// </summary>
-        protected void RaisePropertyChanged([CallerMemberName] string propertyName = "")
+        protected async void RaisePropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));           
         }
 
         /// <summary>
