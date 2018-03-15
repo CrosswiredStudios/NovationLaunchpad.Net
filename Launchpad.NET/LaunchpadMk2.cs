@@ -436,6 +436,16 @@ namespace Launchpad.NET
             SimulateGridRelease((y + 1) * 10 + x + 1);
         }
 
+        public void SimulateTopPress(int id)
+        {
+            UpdateTopButton(new MidiControlChangeMessage(0, (byte)id, 127));
+        }
+
+        public void SimulateTopRelease(int id)
+        {
+            UpdateTopButton(new MidiControlChangeMessage(0, (byte)id, 0));
+        }
+
         public override void UnregisterEffect(ILaunchpadEffect effect)
         {
             EffectsDisposables[effect].Dispose();

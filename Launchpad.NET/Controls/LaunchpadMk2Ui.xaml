@@ -19,10 +19,13 @@
 
     <RelativePanel
         x:Name="RpContainer"
+        Background="Gray"
         HorizontalAlignment="Center"
+        Padding="8"
         VerticalAlignment="Stretch">
         <Grid
-            x:Name="GTop">
+            x:Name="GTop"
+            Margin="0,0,0,4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="32" />
                 <ColumnDefinition Width="32" />
@@ -104,9 +107,6 @@
         </Grid>
         <Grid
             x:Name="GGrid"
-            Background="Gray"
-            CornerRadius="3"
-            Padding="8"
             RelativePanel.Below="GTop"
             VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
@@ -650,6 +650,7 @@
         </Grid>
         <Grid
             x:Name="GSide"
+            Margin="4,0,0,0"
             RelativePanel.Below="GTop"
             RelativePanel.RightOf="GGrid">
             <Grid.ColumnDefinitions>

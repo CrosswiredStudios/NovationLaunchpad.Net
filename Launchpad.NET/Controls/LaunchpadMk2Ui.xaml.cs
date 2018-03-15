@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 using Launchpad.NET.Models;
 using System.Reactive.Linq;
 using System.Threading;
+using Windows.Devices.Midi;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -74,6 +75,15 @@ namespace Launchpad.NET.Controls
 
         void BuildInteractions()
         {
+            RpButton104.Tapped += (s, e) => SimulatePress(104);
+            RpButton105.Tapped += (s, e) => SimulatePress(105);
+            RpButton106.Tapped += (s, e) => SimulatePress(106);
+            RpButton107.Tapped += (s, e) => SimulatePress(107);
+            RpButton108.Tapped += (s, e) => SimulatePress(108);
+            RpButton109.Tapped += (s, e) => SimulatePress(109);
+            RpButton110.Tapped += (s, e) => SimulatePress(110);
+            RpButton111.Tapped += (s, e) => SimulatePress(111);
+
             RpButton00.Tapped += (s, e) => SimulatePress(11);
             RpButton10.Tapped += (s, e) => SimulatePress(12);
             RpButton20.Tapped += (s, e) => SimulatePress(13);
@@ -139,12 +149,35 @@ namespace Launchpad.NET.Controls
             RpButton67.Tapped += (s, e) => SimulatePress(87);
             RpButton77.Tapped += (s, e) => SimulatePress(88);
 
+            RpSide70.Tapped += (s, e) => SimulatePress(19);
+            RpSide71.Tapped += (s, e) => SimulatePress(29);
+            RpSide72.Tapped += (s, e) => SimulatePress(39);
+            RpSide73.Tapped += (s, e) => SimulatePress(49);
+            RpSide74.Tapped += (s, e) => SimulatePress(59);
+            RpSide75.Tapped += (s, e) => SimulatePress(69);
+            RpSide76.Tapped += (s, e) => SimulatePress(79);
+            RpSide77.Tapped += (s, e) => SimulatePress(89);
         }
 
         void SimulatePress(int id)
         {
-            LaunchpadMk2?.SimulateGridPress(id);
-            LaunchpadMk2?.SimulateGridRelease(id);
+            if (id >= 104)
+            {
+                LaunchpadMk2?.SimulateTopPress(id);
+                LaunchpadMk2?.SimulateTopRelease(id);
+            }
+            else
+            {
+                if (id % 10 == 9)
+                {
+                    //UpdateSideButton(new MidiNoteOnMessage(0, (byte)id, 127));
+                }
+                else
+                {
+                    LaunchpadMk2?.SimulateGridPress(id);
+                    LaunchpadMk2?.SimulateGridRelease(id);
+                }
+            }
         }
 
         /// <summary>
