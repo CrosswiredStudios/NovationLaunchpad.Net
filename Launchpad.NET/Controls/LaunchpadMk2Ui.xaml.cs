@@ -43,7 +43,7 @@ namespace Launchpad.NET.Controls
 
                 UpdateButtons();
 
-                value
+                value?
                     .WhenButtonStateChanged
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe(_ => 
@@ -71,6 +71,8 @@ namespace Launchpad.NET.Controls
             this.InitializeComponent();
 
             BuildInteractions();
+
+            Bindings.Update();
         }
 
         void BuildInteractions()
@@ -84,7 +86,8 @@ namespace Launchpad.NET.Controls
             RpButton110.Tapped += (s, e) => SimulatePress(110);
             RpButton111.Tapped += (s, e) => SimulatePress(111);
 
-            RpButton00.Tapped += (s, e) => SimulatePress(11);
+            RpButton00.PointerPressed += (s, e) => SimulatePress(11);
+            RpButton00.PointerReleased += (s, e) => SimulateRelease(11);
             RpButton10.Tapped += (s, e) => SimulatePress(12);
             RpButton20.Tapped += (s, e) => SimulatePress(13);
             RpButton30.Tapped += (s, e) => SimulatePress(14);
@@ -164,17 +167,34 @@ namespace Launchpad.NET.Controls
             if (id >= 104)
             {
                 LaunchpadMk2?.SimulateTopPress(id);
+            }
+            else
+            {
+                if (id % 10 == 9)
+                {
+                    LaunchpadMk2?.SimulateSidePress(id);
+                }
+                else
+                {
+                    LaunchpadMk2?.SimulateGridPress(id);
+                }
+            }
+        }
+
+        void SimulateRelease(int id)
+        {
+            if (id >= 104)
+            {
                 LaunchpadMk2?.SimulateTopRelease(id);
             }
             else
             {
                 if (id % 10 == 9)
                 {
-                    //UpdateSideButton(new MidiNoteOnMessage(0, (byte)id, 127));
+                    LaunchpadMk2?.SimulateSideRelease(id);
                 }
                 else
                 {
-                    LaunchpadMk2?.SimulateGridPress(id);
                     LaunchpadMk2?.SimulateGridRelease(id);
                 }
             }

@@ -74,6 +74,8 @@ namespace Launchpad.NET.Effects
 
         public PiskelFile(string jsonString)
         {
+            Animation = new List<Color[,]>();
+
             var jContents = JObject.Parse(jsonString);
 
             ModelVersion = (int)jContents["modelVersion"];

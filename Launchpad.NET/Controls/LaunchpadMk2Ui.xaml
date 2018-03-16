@@ -20,12 +20,18 @@
     <RelativePanel
         x:Name="RpContainer"
         Background="Gray"
+        CornerRadius="5"
         HorizontalAlignment="Center"
         Padding="8"
         VerticalAlignment="Stretch">
+        <TextBlock
+            x:Name="TbName"
+            Padding="0,4"
+            Text="{x:Bind LaunchpadMk2.Name, Mode=OneWay}"/>
         <Grid
             x:Name="GTop"
-            Margin="0,0,0,4">
+            Margin="0,0,0,4"
+            RelativePanel.Below="TbName">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="32" />
                 <ColumnDefinition Width="32" />

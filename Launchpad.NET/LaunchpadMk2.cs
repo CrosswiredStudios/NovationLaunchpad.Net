@@ -9,6 +9,7 @@ using Launchpad.NET.Models;
 using Windows.UI;
 using System;
 using System.Reactive;
+using System.Reflection;
 using System.Threading;
 
 // https://global.novationmusic.com/sites/default/files/novation/downloads/10529/launchpad-mk2-programmers-reference-guide_0.pdf
@@ -187,6 +188,14 @@ namespace Launchpad.NET
                 topButtons.Add(new LaunchpadMk2TopButton((byte)(x + 104), Colors.Black, outPort));
         }
 
+        public void FindAvailableEffects(Assembly assembly)
+        {
+            var types = assembly.GetTypes();
+            var effects =  types.Where(t => t.GetInterfaces().Contains(typeof(ILaunchpadEffect)));
+            foreach(var effect in effects)
+                Debug.WriteLine(effect);
+        }
+
         public void FlushGridBuffer(bool clearBufferAfter = true)
         {
             try
@@ -198,13 +207,14 @@ namespace Launchpad.NET
                     {
                         //Test
                         var buttonId = (y + 1) * 10 + (x + 1);
+                        Grid[x, y].Color = GridBuffer[x, y];
                         commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)buttonId, (byte)(GridBuffer[x, y].R / 4), (byte)(GridBuffer[x, y].G / 4), (byte)(GridBuffer[x, y].B / 4), 247 });
+
+                        if (clearBufferAfter)
+                            GridBuffer[x, y] = Colors.Black;
                     }
                 }
                 outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
-
-                if (clearBufferAfter)
-                    GridBuffer = new Color[8, 8];
             }
             catch (Exception e)
             {
@@ -436,6 +446,24 @@ namespace Launchpad.NET
             SimulateGridRelease((y + 1) * 10 + x + 1);
         }
 
+        /// <summary>
+        /// Simulates pressing a side button on the launchpad mk2
+        /// </summary>
+        /// <param name="id">The id of the button to simulate</param>
+        public void SimulateSidePress(int id)
+        {
+            UpdateSideButton(new MidiNoteOnMessage(0, (byte)id, 127));
+        }
+
+        /// <summary>
+        /// Simulates releasing a side button on the launchpad mk2
+        /// </summary>
+        /// <param name="id">The id of the button to simulate</param>
+        public void SimulateSideRelease(int id)
+        {
+            UpdateSideButton(new MidiNoteOnMessage(0, (byte)id, 0));
+        }
+
         public void SimulateTopPress(int id)
         {
             UpdateTopButton(new MidiControlChangeMessage(0, (byte)id, 127));
@@ -476,7 +504,7 @@ namespace Launchpad.NET
         /// <param name="onMessage"></param>
         void UpdateGridButton(MidiNoteOnMessage onMessage)
         {
-            Debug.WriteLine($"Side Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
+            Debug.WriteLine($"Grid Button Ch:{onMessage.Channel}, Note:{onMessage.Note}, Vel:{onMessage.Velocity} (x:{onMessage.Note % 10}, y:{(int)(onMessage.Note / 10)}) " + (onMessage.Velocity == 0 ? "Released" : "Pressed"));
 
             try
             {
