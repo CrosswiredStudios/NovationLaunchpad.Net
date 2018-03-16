@@ -65,6 +65,7 @@ namespace Launchpad.NET
         int resetCount;
         Timer resetTimer;
 
+
         public LaunchpadMk2(string name, MidiInPort inPort = null, IMidiOutPort outPort = null)
         {
             Name = name;
@@ -215,6 +216,7 @@ namespace Launchpad.NET
                     }
                 }
                 outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+                whenButtonStateChanged.OnNext(null);
             }
             catch (Exception e)
             {
@@ -293,6 +295,7 @@ namespace Launchpad.NET
             {
                 var command = new byte[] { 240, 0, 32, 41, 2, 24, 14, (byte)color, 247 };
                 outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+                whenButtonStateChanged.OnNext(null);
             }
             catch (Exception e)
             {
@@ -328,6 +331,8 @@ namespace Launchpad.NET
                     };
                     outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
                 }
+
+                whenButtonStateChanged.OnNext(null);
             }
             catch (Exception ex)
             {
@@ -356,6 +361,7 @@ namespace Launchpad.NET
         {
             var command = new byte[] { 240, 0, 32, 41, 2, 24, 12, (byte)column, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         public void SetGridColor(Color color)
@@ -367,6 +373,7 @@ namespace Launchpad.NET
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)Grid[x, y].Id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         public void SetGridRowColor(int row, Color color)
@@ -377,6 +384,7 @@ namespace Launchpad.NET
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)Grid[x, row].Id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         public void SetRowColor(int row, LaunchpadMk2Color color)
@@ -388,14 +396,14 @@ namespace Launchpad.NET
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, (byte)color, 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         public void SetTopRowButtonColor(int id, Color color)
         {
-
             var command = new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)(id + 104), (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 };
-
             outPort?.SendMessage(new MidiSystemExclusiveMessage(command.AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         public void SetTopRowColor(Color color)
@@ -406,6 +414,7 @@ namespace Launchpad.NET
                 commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)buttonId, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
             }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+            whenButtonStateChanged.OnNext(null);
         }
 
         /// <summary>
