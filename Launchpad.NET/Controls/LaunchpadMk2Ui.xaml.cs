@@ -17,6 +17,7 @@ using Launchpad.NET.Models;
 using System.Reactive.Linq;
 using System.Threading;
 using Windows.Devices.Midi;
+using System.Reactive.Disposables;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -33,6 +34,8 @@ namespace Launchpad.NET.Controls
                 typeof(LaunchpadMk2Ui), null
             );
 
+        CompositeDisposable disposables;
+
         // The property wrapper, so that callers can use this property through a simple ExampleClassInstance.IsSpinning usage rather than requiring property system APIs
         public LaunchpadMk2 LaunchpadMk2
         {
@@ -41,20 +44,31 @@ namespace Launchpad.NET.Controls
             {
                 SetValue(LaunchpadMk2Property, value);
 
-                UpdateButtons();
+                if (value == null) return;
 
-                value?
-                    .WhenButtonStateChanged
+                UpdateButtons();
+                
+                disposables?.Dispose();
+                disposables = new CompositeDisposable();
+
+                disposables.Add(value?
+                    .WhenButtonColorsChanged
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe(_ => 
                     {
                         Bindings.Update();
-                    });
+                    }));
+
+                disposables.Add(value?
+                    .WhenButtonStateChanged
+                    .ObserveOn(SynchronizationContext.Current)
+                    .Subscribe(_ =>
+                    {
+                        Bindings.Update();
+                    }));
             }
         }
-
         public LaunchpadMk2TopButton Top104, Top105, Top106, Top107, Top108, Top109, Top110, Top111;
-
         public LaunchpadMk2Button Grid00, Grid10, Grid20, Grid30, Grid40, Grid50, Grid60, Grid70,
                                   Grid01, Grid11, Grid21, Grid31, Grid41, Grid51, Grid61, Grid71,
                                   Grid02, Grid12, Grid22, Grid32, Grid42, Grid52, Grid62, Grid72,
@@ -63,7 +77,6 @@ namespace Launchpad.NET.Controls
                                   Grid05, Grid15, Grid25, Grid35, Grid45, Grid55, Grid65, Grid75,
                                   Grid06, Grid16, Grid26, Grid36, Grid46, Grid56, Grid66, Grid76,
                                   Grid07, Grid17, Grid27, Grid37, Grid47, Grid57, Grid67, Grid77;
-
         public LaunchpadMk2Button Side70, Side71, Side72, Side73, Side74, Side75, Side76, Side77;
 
         public LaunchpadMk2Ui()

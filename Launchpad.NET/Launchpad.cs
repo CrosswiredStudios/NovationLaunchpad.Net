@@ -27,13 +27,15 @@ namespace Launchpad.NET
         protected MidiInPort inPort;
         protected IMidiOutPort outPort;
         protected List<LaunchpadMk2Button> sideButtons;
-        protected List<LaunchpadMk2TopButton> topButtons;
+        protected List<LaunchpadMk2TopButton> topButtons;        
+        protected readonly Subject<Unit> whenButtonColorsChanged = new Subject<Unit>();
         protected readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();
         protected readonly Subject<Unit> whenReset = new Subject<Unit>();
 
         public Dictionary<ILaunchpadEffect, CompositeDisposable> EffectsDisposables { get; }
         public Dictionary<ILaunchpadEffect, Timer> EffectsTimers { get; }
         public string Name { get; set; }
+        public IObservable<Unit> WhenButtonColorsChanged => whenButtonColorsChanged;
         /// <summary>
         /// Observable event for when a button on the launchpad is pressed or released
         /// </summary>
