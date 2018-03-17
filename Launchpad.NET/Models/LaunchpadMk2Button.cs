@@ -15,6 +15,7 @@ namespace Launchpad.NET.Models
         byte Channel { get; set; }
         Color Color { get; set; }
         byte Id { get; set; }
+        bool IsPulsing { get; set; }
         LaunchpadButtonState State { get; set; }
         int X { get; set; }
         int Y { get; set; }
@@ -36,6 +37,7 @@ namespace Launchpad.NET.Models
             }
         }
         public byte Id { get; set; }
+        public bool IsPulsing { get; set; }
         public LaunchpadButtonState State { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
@@ -45,6 +47,7 @@ namespace Launchpad.NET.Models
             this.color = color;
             Channel = channel;            
             Id = id;
+            IsPulsing = false;
             State = LaunchpadButtonState.Released;
         }
 
@@ -54,7 +57,8 @@ namespace Launchpad.NET.Models
             this.outPort = outPort;
             Channel = channel;
             // LaunchpadMk2 numbering starts on the bottom left at 11. +1 as you go right, +10 as you go up
-            Id = (byte)(((y+1) * 10) + x+1);            
+            Id = (byte)(((y+1) * 10) + x+1);
+            IsPulsing = false;
             State = LaunchpadButtonState.Released;
             X = x;
             Y = y;
