@@ -27,6 +27,7 @@ namespace Launchpad.NET.Models
         public LaunchpadButtonState State { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public bool IsPulsing { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public LaunchpadMk2TopButton(byte id, Color color)
         {
