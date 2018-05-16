@@ -134,11 +134,11 @@ namespace Launchpad.NET.Effects
         PiskelFile piskelFile;
         readonly Subject<Unit> whenComplete = new Subject<Unit>();
 
-        public string Name => "Piskel";
+        public override string Name => "Piskel";
 
-        public IObservable<int> WhenChangeUpdateFrequency => null;
+        public override IObservable<int> WhenChangeUpdateFrequency => null;
 
-        public IObservable<ILaunchpadEffect> WhenComplete => null;
+        public override IObservable<ILaunchpadEffect> WhenComplete => null;
 
         public PiskelEffect(string filePath, bool loop)
         {
@@ -181,17 +181,19 @@ namespace Launchpad.NET.Effects
             }
         }
 
-        public void Initiate(Launchpad launchpad)
+        public override void Initiate(Launchpad launchpad)
         {
             this.launchpad = launchpad as LaunchpadMk2;
             try
             {
                 CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
-                    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(filePath);
-                    var fileStream = File.OpenText(filePath);
-                    var contents = fileStream.ReadToEnd();
-                    piskelFile = new PiskelFile(contents);
+                    using (var fileStream = File.OpenText(@"Animations\initiate0.piskel"))
+                    {
+                        var contents = fileStream.ReadToEnd();
+                        piskelFile = new PiskelFile(contents);
+                    }
+                    
                     var pngData = piskelFile.Layers.First().Chunks.First().Data;
                     bitmap = SKBitmap.Decode(pngData);
 
@@ -224,12 +226,12 @@ namespace Launchpad.NET.Effects
             }
         }
 
-        public void Terminate()
+        public override void Terminate()
         {
             
         }
 
-        public void Update()
+        public override void Update()
         {
             if (!isInitiated || isFinished) return;
             currentFrameIndex++;
