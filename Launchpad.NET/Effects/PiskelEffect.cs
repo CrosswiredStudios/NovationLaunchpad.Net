@@ -37,12 +37,14 @@ namespace Launchpad.NET.Effects
     public class PiskelLayer
     {
         public PiskelChunk[] Chunks { get; }
+        public List<Color[,]> Frames { get; private set; }
         public int FrameCount { get; }
         public string Name { get; }
         public int Opacity { get; }
         
         public PiskelLayer(string data)
         {
+            
             var layerData = JObject.Parse(data);
 
             FrameCount = (int)layerData["frameCount"];
@@ -55,6 +57,25 @@ namespace Launchpad.NET.Effects
             for (var index = 0; index < chunksData.Count; index++)
             {
                 Chunks[index] = new PiskelChunk(chunksData[index].ToString());
+            }
+
+            var pngData = Chunks.First().Data;
+            var bitmap = SKBitmap.Decode(pngData);
+            var frameWidth = bitmap.Width / FrameCount;
+            Frames = new List<Color[,]>();
+            for (var frameIndex = 0; frameIndex < FrameCount; frameIndex++)
+            {
+                var frame = new Color[frameWidth, bitmap.Height];
+                var xOffset = frameIndex * frameWidth;
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    for (var x = 0; x < frameWidth; x++)
+                    {
+                        var pixel = bitmap.Pixels[bitmap.Width * y + (x + xOffset)];
+                        frame[x, 7 - y] = Color.FromArgb(pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue);
+                    }
+                }
+                Frames.Add(frame);
             }
         }
     }
