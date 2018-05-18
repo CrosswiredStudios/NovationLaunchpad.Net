@@ -387,6 +387,9 @@ namespace Launchpad.NET
                 {
                     var color = colors[x, y];
                     var id = (y + 1) * 10 + x + 1;
+                    // Logisticaly update the button
+                    var button = Grid[id % 10 - 1, id / 10 - 1];
+                    button.Color = color;
                     commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
                 }
             outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
