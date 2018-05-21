@@ -30,6 +30,7 @@ namespace Launchpad.NET
         protected List<LaunchpadMk2TopButton> topButtons;        
         protected readonly Subject<Unit> whenButtonColorsChanged = new Subject<Unit>();
         protected readonly Subject<ILaunchpadButton> whenButtonStateChanged = new Subject<ILaunchpadButton>();
+        protected readonly Subject<Unit> whenDisconnected = new Subject<Unit>();
         protected readonly Subject<Unit> whenReset = new Subject<Unit>();
 
         public Dictionary<ILaunchpadEffect, CompositeDisposable> EffectsDisposables { get; }
@@ -40,6 +41,7 @@ namespace Launchpad.NET
         /// Observable event for when a button on the launchpad is pressed or released
         /// </summary>
         public IObservable<ILaunchpadButton> WhenButtonStateChanged => whenButtonStateChanged;
+        public IObservable<Unit> WhenDisconnected => whenDisconnected;
         public IObservable<Unit> WhenReset => whenReset;
 
         public Launchpad()

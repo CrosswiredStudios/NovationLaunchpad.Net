@@ -381,19 +381,26 @@ namespace Launchpad.NET
 
         public void SetGridColor(Color[,] colors)
         {
-            var commandBytes = new List<byte>();
-            for (var y = 0; y < 8; y++)
-                for (var x = 0; x < 8; x++)
-                {
-                    var color = colors[x, y];
-                    var id = (y + 1) * 10 + x + 1;
-                    // Logisticaly update the button
-                    var button = Grid[id % 10 - 1, id / 10 - 1];
-                    button.Color = color;
-                    commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
-                }
-            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
-            whenButtonColorsChanged.OnNext(Unit.Default);
+            try
+            {
+                var commandBytes = new List<byte>();
+                for (var y = 0; y < 8; y++)
+                    for (var x = 0; x < 8; x++)
+                    {
+                        var color = colors[x, y];
+                        var id = (y + 1) * 10 + x + 1;
+                        // Logisticaly update the button
+                        var button = Grid[id % 10 - 1, id / 10 - 1];
+                        button.Color = color;
+                        commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 11, (byte)id, (byte)(color.R / 4), (byte)(color.G / 4), (byte)(color.B / 4), 247 });
+                    }
+                outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+                whenButtonColorsChanged.OnNext(Unit.Default);
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         public void SetGridRowColor(int row, Color color)
@@ -505,10 +512,19 @@ namespace Launchpad.NET
 
         public override void UnregisterEffect(ILaunchpadEffect effect)
         {
-            EffectsDisposables[effect].Dispose();
-            EffectsDisposables.Remove(effect);
-            EffectsTimers[effect].Dispose();
-            EffectsTimers.Remove(effect);
+            try
+            {
+                EffectsDisposables[effect].Dispose();
+                EffectsDisposables.Remove(effect);
+            }
+            catch { }
+
+            try
+            {
+                EffectsTimers[effect].Dispose();
+                EffectsTimers.Remove(effect);
+            }
+            catch { }
             effect.Dispose();
         }
 
