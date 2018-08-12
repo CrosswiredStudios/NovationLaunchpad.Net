@@ -48,6 +48,14 @@ namespace Launchpad.NET
         {
             EffectsDisposables = new Dictionary<ILaunchpadEffect, CompositeDisposable>();
             EffectsTimers = new Dictionary<ILaunchpadEffect, Timer>();
+            whenDisconnected
+                .Subscribe(_ => UnregisterAllEffects());
+                
+        }
+
+        void CheckConnectionStatus()
+        {
+
         }
 
         void OnChangeEffectUpdateFrequency(ILaunchpadEffect effect, int newFrequency)
@@ -69,7 +77,6 @@ namespace Launchpad.NET
         {
             try
             {
-
                 // Register any observables being used
                 CompositeDisposable effectDisposables = new CompositeDisposable();
 
@@ -112,8 +119,8 @@ namespace Launchpad.NET
             {
                 Debug.WriteLine(ex);
             }
-
         }
+
         public abstract void SendMessage(IMidiMessage message);
 
         public abstract void UnregisterEffect(ILaunchpadEffect effect);

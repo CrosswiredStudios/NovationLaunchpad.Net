@@ -89,12 +89,19 @@ namespace Launchpad.NET
                     Grid[7, 7].State == LaunchpadButtonState.Pressed &&
                     Grid[7, 0].State == LaunchpadButtonState.Pressed)
                 {
+                    Debug.WriteLine("Reset in " + (10 - resetCount).ToString() + " seconds.");
+
                     // Increase the reset count
                     resetCount++;
-
+                    
                     // If the user has held the buttons for 10 seconds
                     if (resetCount > 10)
                     {
+                        Debug.WriteLine("Launchpad was reset.");
+
+                        // Reset the count
+                        resetCount = 0;
+
                         // Notify anyone interested in the event
                         whenReset.OnNext(Unit.Default);
                     }
@@ -397,8 +404,17 @@ namespace Launchpad.NET
                 outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
                 whenButtonColorsChanged.OnNext(Unit.Default);
             }
+            catch(ObjectDisposedException ex)
+            {
+                whenDisconnected.OnNext(Unit.Default);
+                Debug.WriteLine(ex);
+            }
             catch(Exception ex)
             {
+                if(ex.HResult == -2147023279)
+                {
+                    whenDisconnected.OnNext(Unit.Default);
+                }
                 Debug.WriteLine(ex);
             }
         }
