@@ -136,6 +136,8 @@ namespace Launchpad.NET
         public void ClearAll()
         {
             SetAllButtonsColor(LaunchpadMk2Color.Off);
+            SetColumnColor(8, LaunchpadMk2Color.Off);
+            SetTopRowColor(Colors.Black);
             whenButtonColorsChanged.OnNext(Unit.Default);
         }
 
@@ -311,6 +313,18 @@ namespace Launchpad.NET
             {
                 Debug.WriteLine(e);
             }
+        }
+
+        public void SetColumnColor(int column, LaunchpadMk2Color color)
+        {
+            var commandBytes = new List<byte>();
+            for (var x = 0; x < 8; x++)
+            {
+                var buttonId = column + 11 + (x * 10);
+                commandBytes.AddRange(new byte[] { 240, 0, 32, 41, 2, 24, 10, (byte)buttonId, (byte)color, 247 });
+            }
+            outPort?.SendMessage(new MidiSystemExclusiveMessage(commandBytes.ToArray().AsBuffer()));
+            whenButtonColorsChanged.OnNext(Unit.Default);
         }
 
         /// <summary>
